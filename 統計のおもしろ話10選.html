@@ -1,0 +1,1847 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>統計のおもしろ話 10選</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Old+Mincho:wght@400;700;900&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0d1420; --ink-deep:#070c14; --ink-raise:#131d2c;
+  --gold:#d9b449; --gold-dim:#8f7530;
+  --mercury:#a8bccf; --mercury-dim:#5b6f82;
+  --paper:#ece7dc; --muted:#7f8c9b; --copper:#c05b38;
+  --rule:rgba(217,180,73,.22);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--ink-deep);overflow:hidden}
+body{font-family:"Zen Kaku Gothic New","Hiragino Sans","Noto Sans JP",sans-serif;color:var(--paper);-webkit-font-smoothing:antialiased}
+#viewport{position:fixed;inset:0;display:grid;place-items:center}
+#stage{width:1280px;height:720px;position:relative;flex:none;transform-origin:center center;
+  background:var(--ink);box-shadow:0 0 0 1px rgba(217,180,73,.12),0 40px 120px rgba(0,0,0,.7);overflow:hidden}
+#stage::before{content:"";position:absolute;inset:0;pointer-events:none;z-index:0;
+  background-image:
+    linear-gradient(rgba(168,188,207,.045) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(168,188,207,.045) 1px,transparent 1px),
+    linear-gradient(rgba(217,180,73,.055) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(217,180,73,.055) 1px,transparent 1px);
+  background-size:16px 16px,16px 16px,80px 80px,80px 80px}
+#stage::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:1;
+  background:radial-gradient(120% 90% at 50% 40%,transparent 45%,rgba(3,7,13,.75) 100%)}
+
+.slide{position:absolute;inset:0;z-index:2;padding:58px 76px 82px;display:none;flex-direction:column}
+.slide.on{display:flex;animation:rise .45s cubic-bezier(.22,.8,.28,1) both}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+.eyebrow{display:flex;align-items:baseline;gap:14px;margin-bottom:14px}
+.eyebrow .n{font-family:"IBM Plex Mono",monospace;font-weight:300;font-size:13px;letter-spacing:.18em;color:var(--gold)}
+.eyebrow .b{font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.28em;color:var(--mercury-dim)}
+.eyebrow .b::before{content:"／ "}
+.eyebrow .fig{color:var(--gold)}
+
+h2.title{font-family:"Zen Old Mincho",serif;font-weight:700;font-size:42px;line-height:1.22;
+  letter-spacing:.01em;padding-top:16px;border-top:1px solid var(--rule)}
+h2.title em{font-style:normal;color:var(--gold)}
+.lead{margin-top:14px;font-size:17px;line-height:1.7;color:var(--mercury);max-width:920px}
+.slide .body{margin-top:26px;flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center}
+
+.cols{display:grid;gap:20px}
+.c2{grid-template-columns:repeat(2,1fr)}
+.c3{grid-template-columns:repeat(3,1fr)}
+.c4{grid-template-columns:repeat(4,1fr)}
+.card{background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.012));
+  border:1px solid rgba(168,188,207,.14);border-top:2px solid var(--gold-dim);padding:22px 22px 24px}
+.card.merc{border-top-color:var(--mercury-dim)}
+.card.warn{border-top-color:var(--copper)}
+.card h3{font-family:"Zen Old Mincho",serif;font-size:22px;font-weight:700;margin-bottom:10px;color:var(--paper)}
+.card.merc h3{color:var(--mercury)}
+.card.warn h3{color:var(--copper)}
+.card p{font-size:15px;line-height:1.75;color:var(--mercury)}
+
+.note{margin-top:22px;font-size:16px;line-height:1.7;color:var(--muted);text-align:center}
+.frame{border-left:3px solid var(--gold);padding:16px 22px;background:rgba(217,180,73,.06);
+  font-family:"Zen Old Mincho",serif;font-size:21px;line-height:1.65}
+.frame strong{color:var(--gold);font-weight:700}
+.frame.rule{border-left:none;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);
+  background:transparent;text-align:center}
+
+.claim{font-family:"Zen Old Mincho",serif;font-weight:700;font-size:34px;line-height:1.5;
+  display:flex;gap:18px;align-items:baseline;padding:20px 0;border-bottom:1px solid rgba(168,188,207,.14)}
+.claim:last-child{border-bottom:none}
+.claim .mk{font-family:"IBM Plex Mono",monospace;font-size:20px;color:var(--gold);flex:none;width:38px}
+.claim small{display:block;font-family:"Zen Kaku Gothic New",sans-serif;font-weight:400;
+  font-size:16px;color:var(--muted);line-height:1.7;margin-top:6px}
+
+table.kv{width:100%;border-collapse:collapse;font-size:17px}
+table.kv th,table.kv td{padding:14px 18px;border-bottom:1px solid rgba(168,188,207,.14);text-align:left}
+table.kv thead th{font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.2em;
+  color:var(--mercury-dim);font-weight:400;border-bottom:1px solid var(--rule)}
+table.kv tbody th{font-weight:500;color:var(--muted);width:150px;font-size:15px}
+table.kv .gold{color:var(--gold)}
+table.kv .merc{color:var(--mercury)}
+
+ul.dots{list-style:none}
+ul.dots li{position:relative;padding-left:26px;margin-bottom:14px;font-size:17px;line-height:1.75;color:var(--paper)}
+ul.dots li::before{content:"";position:absolute;left:4px;top:12px;width:7px;height:7px;background:var(--gold);transform:rotate(45deg)}
+
+.legend{display:flex;gap:24px;font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.1em;color:var(--muted)}
+.legend i{display:inline-block;width:22px;height:2px;vertical-align:middle;margin-right:8px}
+.legend .g i{background:var(--gold)}
+.legend .m i{background:transparent;height:0;border-top:2px dashed var(--mercury)}
+
+.ctl{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+button.btn{font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.14em;background:transparent;
+  color:var(--gold);border:1px solid var(--gold-dim);padding:9px 18px;cursor:pointer;transition:.2s}
+button.btn:hover,button.btn:focus-visible{background:rgba(217,180,73,.14);color:#f0d98a}
+button.btn.act{background:var(--gold);color:var(--ink);border-color:var(--gold)}
+button.btn:focus-visible{outline:2px solid var(--mercury);outline-offset:2px}
+
+.slider{display:flex;align-items:center;gap:14px}
+.slider label{font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.14em;color:var(--muted)}
+input[type=range]{-webkit-appearance:none;appearance:none;width:260px;height:2px;background:rgba(168,188,207,.3);outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;
+  background:var(--gold);border:3px solid var(--ink);cursor:pointer;box-shadow:0 0 0 1px var(--gold)}
+input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--gold);
+  border:3px solid var(--ink);cursor:pointer;box-shadow:0 0 0 1px var(--gold)}
+input[type=range]:focus-visible{outline:2px solid var(--mercury);outline-offset:6px}
+.val{font-family:"IBM Plex Mono",monospace;font-size:20px;color:var(--gold);width:52px}
+
+.figwrap{display:flex;gap:28px;align-items:center}
+.figwrap.top{align-items:flex-start}
+.fig{flex:1;min-width:0}
+.fig svg{width:100%;height:auto;display:block}
+.side{width:330px;flex:none}
+
+ol.phases{list-style:none;counter-reset:p}
+ol.phases li{counter-increment:p;position:relative;padding:9px 10px 9px 40px;font-size:14.5px;line-height:1.5;
+  color:var(--muted);cursor:pointer;border-left:2px solid transparent;transition:.2s}
+ol.phases li::before{content:counter(p);position:absolute;left:12px;top:9px;
+  font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--gold-dim)}
+ol.phases li.hot{color:var(--paper);border-left-color:var(--gold);background:rgba(217,180,73,.08)}
+ol.phases li.hot::before{color:var(--gold)}
+
+.flowrow{display:flex;gap:14px;align-items:stretch}
+.flowrow .card{flex:1;opacity:.45;transition:.35s}
+.flowrow .arw{align-self:center;font-size:22px;color:var(--mercury-dim);transition:.3s}
+
+.cover{padding:0}
+.cover .heroart{position:absolute;inset:0;z-index:0;opacity:.5}
+.cover .heroart svg{width:100%;height:100%}
+.cover .txt::before{content:"";position:absolute;inset:0;z-index:-1;
+  background:linear-gradient(100deg,rgba(13,20,32,.95) 0%,rgba(13,20,32,.9) 38%,rgba(13,20,32,.55) 62%,rgba(13,20,32,0) 82%)}
+.cover .txt{position:relative;z-index:2;height:100%;display:flex;flex-direction:column;justify-content:center;padding:0 96px}
+.cover .rule{width:72px;height:2px;background:var(--gold);margin-bottom:28px}
+.cover h1{font-family:"Zen Old Mincho",serif;font-weight:900;font-size:76px;line-height:1.18;
+  letter-spacing:.02em;text-shadow:0 4px 40px rgba(7,12,20,.9)}
+.cover h1 span{color:var(--gold)}
+.cover .sub{margin-top:26px;font-family:"Zen Old Mincho",serif;font-size:26px;color:var(--mercury);letter-spacing:.04em}
+.cover .meta{margin-top:36px;font-family:"IBM Plex Mono",monospace;font-size:12.5px;letter-spacing:.2em;color:var(--mercury-dim);line-height:2}
+
+#rail{position:absolute;left:76px;right:76px;bottom:34px;z-index:5;display:flex;align-items:center;gap:18px}
+#ticks{display:flex;gap:4px;flex:1}
+#ticks .t{height:2px;flex:1;background:rgba(168,188,207,.2);transition:.3s}
+#ticks .t.done{background:var(--gold-dim)}
+#ticks .t.cur{background:var(--gold);height:4px;margin-top:-1px}
+#counter{font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.16em;color:var(--muted)}
+#counter b{color:var(--gold);font-weight:400}
+#hint{position:absolute;right:76px;bottom:56px;z-index:5;font-family:"IBM Plex Mono",monospace;
+  font-size:11px;letter-spacing:.14em;color:var(--mercury-dim);opacity:.75}
+.src{position:absolute;left:76px;bottom:56px;z-index:5;font-family:"IBM Plex Mono",monospace;
+  font-size:10.5px;letter-spacing:.1em;color:#4a5866}
+
+@media print{
+  html,body{overflow:visible;background:#fff}
+  #viewport{position:static;display:block}
+  #stage{transform:none !important;page-break-after:always;box-shadow:none}
+  .slide{display:flex !important;position:relative;page-break-after:always}
+  #hint{display:none}
+}
+@media (prefers-reduced-motion:reduce){.slide.on{animation:none}*{animation-duration:.001ms !important}}
+/* ===== 黒背景・インフォグラフィック用の追加CSS ===== */
+:root{--ink:#0b0b0d;--ink-deep:#000;--ink-raise:#18191d;--copper:#e06a45}
+html,body{background:#000}
+#stage{background:#0b0b0d;box-shadow:0 0 0 1px rgba(217,180,73,.10)}
+#stage::before,#stage::after{display:none}
+#hint{display:none}
+#rail{left:56px;right:56px;bottom:24px}
+
+.slide.ig{padding:26px 56px 58px}
+.ig .eyebrow{margin-bottom:6px}
+.ig .eyebrow .b{font-family:"Zen Kaku Gothic New",sans-serif;font-size:13px;letter-spacing:.12em}
+.ig h2.title{font-size:34px;padding-top:10px;white-space:nowrap}
+.ig .lead{margin-top:6px;font-size:18px;max-width:none;white-space:nowrap;color:var(--mercury)}
+.ig .lead b{color:var(--gold);font-weight:700}
+.g2{margin-top:14px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;height:380px}
+.ig .card.pn{background:#141519;border:none;border-radius:10px;padding:14px 18px;display:flex;flex-direction:column;gap:8px;min-width:0;cursor:default}
+.ph{display:flex;justify-content:space-between;align-items:center;gap:10px;min-height:40px}
+.ph h3{font-family:"Zen Kaku Gothic New",sans-serif;font-size:18px;font-weight:700;margin:0;color:var(--paper);white-space:nowrap}
+.ph .s{font-size:14px;color:var(--muted);margin-top:2px;white-space:nowrap}
+.ph .r{display:flex;align-items:center;gap:8px;flex:none}
+.tk3{margin-top:12px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;height:100px}
+.tk3 .card{background:#131417;border:none;border-radius:10px;padding:12px 16px;display:flex;flex-direction:column;justify-content:center;cursor:default}
+.tk3 h4{font-size:16px;font-weight:700;color:var(--mercury);margin-bottom:4px}
+.tk3 p{font-size:15px;line-height:1.55;color:var(--paper)}
+.tk3 .card.hint{background:rgba(217,180,73,.09)}
+.tk3 .card.hint h4{color:var(--gold)}
+
+.bt{font-family:"Zen Kaku Gothic New",sans-serif;font-size:14px;font-weight:700;height:36px;padding:0 14px;border-radius:8px;
+  background:transparent;color:var(--gold);border:1px solid var(--gold-dim);cursor:pointer;white-space:nowrap;transition:.15s}
+.bt:hover{background:rgba(217,180,73,.12)}
+.bt.pri{background:var(--gold);color:#141414;border-color:var(--gold)}
+.bt.pri:hover{background:#e8c65c}
+.bt.alt{color:var(--mercury);border-color:#4b5a69}
+.bt.alt:hover{background:rgba(168,188,207,.10)}
+.bt.red{background:var(--copper);border-color:var(--copper);color:#141414}
+.bt.act{background:var(--mercury);color:#141414;border-color:var(--mercury)}
+.bt:disabled{opacity:.35;cursor:default}
+.bt:focus-visible{outline:2px solid var(--mercury);outline-offset:2px}
+
+.big{font-family:"Zen Old Mincho",serif;font-weight:700;font-size:34px;line-height:1;color:var(--paper)}
+.gold{color:var(--gold)} .merc{color:var(--mercury)} .cop{color:var(--copper)} .mut{color:var(--muted)}
+.ro{display:flex;align-items:baseline;gap:8px;flex-wrap:nowrap;white-space:nowrap}
+.ro .u{font-size:16px}
+.sl{display:flex;align-items:center;gap:12px}
+.sl label{font-size:14px;color:var(--muted);white-space:nowrap}
+.pn input[type=range]{flex:1;width:auto;min-width:0}
+.sl .v{font-family:"IBM Plex Mono",monospace;font-size:17px;color:var(--gold);min-width:64px;text-align:right;white-space:nowrap}
+.st{display:flex;justify-content:space-between;align-items:center;gap:10px;min-height:26px}
+.st .m{font-size:16px;font-weight:700}
+.st .sm{font-size:14px;color:var(--muted);white-space:nowrap}
+.txt{font-size:15px;line-height:1.6;color:var(--paper)}
+.cap{font-size:14px;color:var(--muted)}
+.pn svg{display:block;width:100%;height:auto}
+
+/* 横棒 */
+.hb{display:flex;align-items:center;gap:10px}
+.hb .lb{width:76px;font-size:15px;font-weight:700;flex:none}
+.hb .tr{position:relative;flex:1;height:20px;background:#24262b;border-radius:5px;overflow:hidden}
+.hb .fl{height:100%;border-radius:5px;transition:width .35s}
+.hb .th{position:absolute;top:0;bottom:0;width:2px;background:var(--paper)}
+.hb .vl{width:150px;font-size:13px;color:var(--muted);white-space:nowrap;flex:none}
+.hb .vl b{font-size:17px;color:var(--paper);margin-right:6px}
+
+/* 01 誕生日 */
+.bgrid{display:grid;grid-template-columns:repeat(25,12px);gap:3px;justify-content:center;padding:0}
+.bc{width:12px;height:12px;border-radius:3px;background:#24262b}
+.bc.one{background:#6f8aa6}
+.bc.last{box-shadow:0 0 0 2px var(--gold)}
+.bc.hit{background:var(--copper);box-shadow:0 0 0 3px rgba(224,106,69,.35)}
+
+/* 02 モンティ */
+.doors{display:flex;justify-content:center;gap:30px}
+.dcol{display:flex;flex-direction:column;align-items:center;gap:6px}
+.door{width:100px;height:110px;border:none;border-radius:12px 12px 3px 3px;font-family:"Zen Old Mincho",serif;font-weight:700;
+  font-size:40px;background:#4a5f74;color:var(--paper);cursor:default;transition:background .3s}
+.door.can{cursor:pointer}
+.door.can:hover{background:#5b7590}
+.door.pick{box-shadow:0 0 0 3px #0b0b0d,0 0 0 6px var(--gold)}
+.door.goat{background:#24262b;color:var(--muted);font-size:26px}
+.door.car{background:var(--gold);color:#141414;font-size:36px}
+.dtag{height:20px;font-size:14px;font-weight:700}
+.mgrid{width:196px;display:grid;grid-template-columns:repeat(10,16px);grid-auto-rows:16px;gap:4px;align-content:start;flex:none}
+.mc{width:16px;height:16px;border-radius:4px 4px 2px 2px;background:#2a2c31}
+.mc.pk{background:#6f8aa6;box-shadow:0 0 0 2px var(--paper)}
+.mc.kp{background:var(--gold)}
+.lgd{display:flex;flex-direction:column;gap:5px;font-size:13px;color:var(--muted)}
+.lgd span{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:8px;vertical-align:-1px}
+
+/* 03 検査 */
+.ygrid{display:grid;grid-template-columns:repeat(50,7px);grid-auto-rows:7px;gap:2px;justify-content:center;padding:4px 0}
+.yd{width:7px;height:7px;border-radius:50%;background:#52575f;transition:background .4s,opacity .4s}
+.yd.sick{background:var(--copper)}
+.yd.fp{background:var(--gold)}
+.yd.fade{opacity:.12}
+.stack{display:flex;height:18px;border-radius:5px;overflow:hidden;background:#24262b}
+.stack div{height:100%;transition:width .35s}
+
+/* 05 飛行機 */
+.zb{display:flex;gap:8px;align-items:center}
+.zb .bt{padding:0 12px}
+.zb .bt.chosen{background:var(--mercury);color:#141414;border-color:var(--mercury)}
+
+/* 06 シンプソン */
+.pbox{position:relative;height:244px}
+.pq{position:absolute;width:12px;height:12px;border-radius:2px;transition:left .8s cubic-bezier(.4,.1,.2,1),top .8s cubic-bezier(.4,.1,.2,1)}
+.plab{position:absolute;font-size:14px;font-weight:700;white-space:nowrap;transition:opacity .4s}
+.ptab{width:100%;border-collapse:collapse;font-size:14px}
+.ptab th,.ptab td{padding:5px 8px;text-align:center;border-bottom:1px solid #26282d}
+.ptab th{color:var(--muted);font-weight:500}
+
+/* 07 コイン */
+.coin{width:100px;height:100px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex:none;
+  font-family:"Zen Old Mincho",serif;font-weight:700;font-size:38px;background:#24262b;color:var(--muted);border:3px solid #3a3d44}
+.coin.h{background:var(--gold);color:#141414;border-color:#f0d98a}
+.coin.t{background:#6f8aa6;color:#141414;border-color:#a8bccf}
+.coin.spin{animation:spin .5s ease-in-out}
+@keyframes spin{0%{transform:rotateY(0)}100%{transform:rotateY(1080deg)}}
+.chist{display:grid;grid-template-columns:repeat(20,20px);grid-auto-rows:20px;gap:4px}
+.ch{width:20px;height:20px;border-radius:50%;background:#24262b}
+.ch.h{background:var(--gold)} .ch.t{background:#6f8aa6}
+
+/* 08 待ち行列 */
+.qbox{position:relative;height:150px;background:#101114;border-radius:8px;overflow:hidden}
+.srv{position:absolute;left:432px;top:34px;width:84px;height:80px;border-radius:8px;border:2px solid var(--mercury);
+  display:flex;align-items:flex-start;justify-content:center;padding-top:6px;font-size:14px;font-weight:700;color:var(--mercury)}
+.qc{position:absolute;width:14px;height:14px;border-radius:50%;background:var(--gold);transition:left .35s,top .35s,opacity .35s}
+.qc.sv{background:var(--mercury)}
+.qmore{position:absolute;left:8px;top:60px;font-size:14px;font-weight:700;color:var(--copper)}
+
+/* 09 秘書 */
+.cards{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:6px}
+.cd{height:58px;border-radius:7px;background:#24262b;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  font-family:"IBM Plex Mono",monospace;font-size:17px;color:var(--muted)}
+.cd small{font-family:"Zen Kaku Gothic New",sans-serif;font-size:11px;color:var(--muted)}
+.cd.seen{background:#2c3138;color:var(--paper)}
+.cd.cur{box-shadow:0 0 0 2px var(--gold);background:#2c3138;color:var(--gold)}
+.cd.hired{background:var(--gold);color:#141414}
+.cd.hired small{color:#141414}
+.cd.best{box-shadow:0 0 0 2px var(--copper)}
+.cd.ghost{color:#59606a}
+
+/* 10 ベンフォード */
+.tick{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px}
+.tick div{height:30px;border-radius:6px;background:#1c1e22;display:flex;align-items:center;justify-content:center;
+  font-family:"IBM Plex Mono",monospace;font-size:15px;color:var(--muted)}
+.tick b{color:var(--gold);font-weight:500}
+
+/* 目次 */
+#tocBtn{position:fixed;right:12px;top:10px;z-index:60;height:34px;padding:0 14px;border-radius:8px;
+  border:1px solid rgba(217,180,73,.4);background:#161616;color:var(--gold);font:600 15px "Zen Kaku Gothic New",sans-serif;cursor:pointer;opacity:.85}
+#tocBtn:hover{background:#2a2618;opacity:1}
+#toc{position:absolute;inset:0;z-index:40;background:#050505;padding:44px 60px;display:none;flex-direction:column}
+#toc.open{display:flex}
+#toc .th{display:flex;justify-content:space-between;align-items:center;margin-bottom:26px}
+#toc .th h2{font-family:"Zen Old Mincho",serif;font-size:35px;color:var(--gold)}
+#toc .tl{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+#toc .ti{height:96px;text-align:left;padding:12px 16px;border-radius:8px;border:1px solid #2a2c31;background:#121316;color:var(--paper);
+  font:500 18px/1.4 "Zen Kaku Gothic New",sans-serif;cursor:pointer;display:flex;flex-direction:column;justify-content:center;gap:4px}
+#toc .ti small{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--muted);letter-spacing:.1em}
+#toc .ti:hover{border-color:var(--gold-dim)}
+#toc .ti.active{border-color:var(--gold);background:rgba(217,180,73,.10)}
+#toc .ti.active small{color:var(--gold)}
+@media print{#tocBtn,#toc{display:none !important}}
+
+/* 表紙 */
+.cover .cv{position:relative;z-index:2;height:100%;display:grid;grid-template-columns:minmax(0,1fr) 520px;gap:40px;align-items:center;padding:0 76px 40px}
+.cover .rule{margin-bottom:22px}
+.cover h1{font-size:52px;font-weight:700;line-height:1.25;text-shadow:none;white-space:nowrap}
+.cover .sub{margin-top:16px;font-size:21px}
+.cvl{list-style:none;margin-top:34px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 24px}
+.cvl li{font-size:15px;color:var(--paper);white-space:nowrap}
+.cvl .no{display:inline-block;width:7px;height:7px;background:var(--gold);transform:rotate(45deg);margin-right:12px;vertical-align:2px}
+.cover .meta{margin-top:34px;font-family:"Zen Kaku Gothic New",sans-serif;font-size:15px;letter-spacing:.12em;color:var(--muted)}
+.cvf{display:flex;flex-direction:column;gap:8px}
+.cvcap{font-size:13px;color:var(--muted);text-align:center}
+
+/* ページ送りの矢印（スライドの外側） */
+.navArrow{position:fixed;z-index:55;width:44px;height:64px;border-radius:10px;border:1px solid #2e3036;background:#111214;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;transition:background .15s,opacity .15s}
+.navArrow:hover{background:#1d1f24;border-color:var(--gold-dim)}
+.navArrow svg{width:22px;height:22px;stroke:var(--gold);fill:none;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.navArrow:disabled{opacity:.25;cursor:default}
+.navArrow:focus-visible{outline:2px solid var(--mercury);outline-offset:2px}
+@media print{.navArrow{display:none !important}}
+
+/* 03 モンティ：3通りの表 */
+.mrow{display:grid;grid-template-columns:78px 138px minmax(0,1fr) 72px 72px;align-items:center;gap:8px;min-height:50px;padding:0 8px;border-radius:8px;transition:background .3s,opacity .3s}
+.mrow.hdr{min-height:18px;font-size:13px;color:var(--muted)}
+.mrow.hdr .c{text-align:center}
+.mrow.dim{opacity:.45}
+.mrow.now{background:rgba(217,180,73,.08)}
+.mrow .ml{font-size:15px;font-weight:700;color:var(--paper);white-space:nowrap}
+.md3{display:flex;gap:6px}
+.md{width:40px;height:42px;border-radius:7px 7px 2px 2px;background:#4a5f74;color:var(--paper);display:flex;align-items:center;justify-content:center;
+  font:700 15px "Zen Kaku Gothic New",sans-serif;font-style:normal;transition:background .3s}
+.md.pick{box-shadow:0 0 0 2px #141519,0 0 0 4px var(--mercury)}
+.md.car{background:var(--gold);color:#141414}
+.md.goat{background:#24262b;color:var(--muted);font-size:13px}
+.md.opened{background:#1a1b1f;color:#59606a;font-size:13px;border:1px dashed #59606a}
+.mh{font-size:14px;color:var(--paper);white-space:nowrap}
+.chip{height:30px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;transition:background .3s}
+.chip.win{background:var(--gold);color:#141414}
+.chip.lose{background:#24262b;color:var(--muted)}
+.chip.q{background:#1c1e22;color:#4b5058}
+.msum{margin-top:4px;display:flex;flex-direction:column;gap:4px;transition:opacity .4s}
+
+/* 目次ページ */
+.tocg{margin-top:22px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 20px}
+.tocc{height:92px;display:flex;align-items:center;gap:18px;padding:0 22px;border-radius:10px;border:1px solid #23252a;background:#141519;
+  text-align:left;cursor:pointer;color:var(--paper);transition:border-color .15s,background .15s}
+.tocc:hover{border-color:var(--gold-dim);background:#191a1e}
+.tocc:focus-visible{outline:2px solid var(--mercury);outline-offset:2px}
+.tocc .tn{font-family:"IBM Plex Mono",monospace;font-size:20px;color:var(--gold);flex:none;width:30px}
+.tocc .tt{display:flex;flex-direction:column;gap:4px;min-width:0}
+.tocc b{font-size:19px;font-weight:700;white-space:nowrap}
+.tocc small{font-size:15px;color:var(--mercury);white-space:nowrap}
+
+/* 下のページ表示：線ではなく点 */
+#ticks{justify-content:center;align-items:center;gap:12px}
+#ticks .t{flex:none;width:9px;height:9px;border-radius:50%;background:#33363c;margin:0}
+#ticks .t.done{background:var(--gold-dim)}
+#ticks .t.cur{width:13px;height:13px;margin:0;background:var(--gold)}
+
+/* スライド外の目次アイコン */
+#tocIcon{position:fixed;z-index:55;width:48px;height:60px;border-radius:10px;border:1px solid #2e3036;background:#111214;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:0;color:var(--gold);font:700 12px "Zen Kaku Gothic New",sans-serif}
+#tocIcon svg{width:22px;height:22px;stroke:var(--gold);fill:none;stroke-width:2.2;stroke-linecap:round}
+#tocIcon:hover{background:#1d1f24;border-color:var(--gold-dim)}
+#tocIcon.here{border-color:var(--gold);background:#1f1c12}
+#tocIcon:focus-visible{outline:2px solid var(--mercury);outline-offset:2px}
+@media print{#tocIcon{display:none !important}}
+
+</style>
+</head>
+<body>
+<div id="viewport"><div id="stage">
+
+<!-- ===== 表紙 ===== -->
+<section class="slide cover on" id="s0">
+  <div class="cv">
+    <div class="cvt">
+      <div class="rule"></div>
+      <h1>統計の<span>おもしろ話</span></h1>
+      <div class="sub">直感がハズれる10の話を、動かして確かめる</div>
+      <ol class="cvl"><li><span class="no"></span>誕生日のパラドックス</li><li><span class="no"></span>モンティ・ホール問題</li><li><span class="no"></span>検査のパラドックス</li><li><span class="no"></span>平均への回帰</li><li><span class="no"></span>生存者バイアス</li><li><span class="no"></span>シンプソンのパラドックス</li><li><span class="no"></span>ギャンブラーの誤謬</li><li><span class="no"></span>待ち行列</li><li><span class="no"></span>秘書問題（37%ルール）</li><li><span class="no"></span>ベンフォードの法則</li></ol>
+      <div class="meta">有限会社ナレッジ・アシスト</div>
+    </div>
+    <div class="cvf">
+      <svg id="cv_svg" viewBox="0 0 520 420" role="img" aria-label="落ちてくる点が山の形に積み上がる図"></svg>
+      <div class="cvcap">1つ1つはバラバラでも、たくさん集まると「形」が見えてくる</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 目次 ===== -->
+<section class="slide ig" id="sT">
+  <div class="eyebrow"><span class="n">02</span><span class="b">統計のおもしろ話 ／ 目次</span></div>
+  <h2 class="title">目次 ― 直感がハズれる<em>10の話</em></h2>
+  <div class="tocg"><button type="button" class="tocc" data-go="2"><span class="tn">03</span><span class="tt"><b>誕生日のパラドックス</b><small>23人で、同じ誕生日の2人がいる確率が50%超え</small></span></button><button type="button" class="tocc" data-go="3"><span class="tn">04</span><span class="tt"><b>モンティ・ホール問題</b><small>ドアを選び直すと、当たる確率が2倍</small></span></button><button type="button" class="tocc" data-go="4"><span class="tn">05</span><span class="tt"><b>検査のパラドックス</b><small>陽性でも、本当に病気なのは約15%</small></span></button><button type="button" class="tocc" data-go="5"><span class="tn">06</span><span class="tt"><b>平均への回帰</b><small>叱った店は伸び、ほめた店は落ちる</small></span></button><button type="button" class="tocc" data-go="6"><span class="tn">07</span><span class="tt"><b>生存者バイアス</b><small>弾の跡がない所を守れ</small></span></button><button type="button" class="tocc" data-go="7"><span class="tn">08</span><span class="tt"><b>シンプソンのパラドックス</b><small>種類ごとに勝っても、合計では負ける</small></span></button><button type="button" class="tocc" data-go="8"><span class="tn">09</span><span class="tt"><b>ギャンブラーの誤謬</b><small>5回続けて表でも、次は1/2</small></span></button><button type="button" class="tocc" data-go="9"><span class="tn">10</span><span class="tt"><b>待ち行列</b><small>稼働率80%を超えると待ち時間が急増</small></span></button><button type="button" class="tocc" data-go="10"><span class="tn">11</span><span class="tt"><b>秘書問題（37%ルール）</b><small>最良の1人を選ぶなら、最初の37%は見送る</small></span></button><button type="button" class="tocc" data-go="11"><span class="tn">12</span><span class="tt"><b>ベンフォードの法則</b><small>数字の先頭は「1」が3割</small></span></button></div>
+</section>
+
+<!-- ===== 01 誕生日のパラドックス ===== -->
+<section class="slide ig" id="s1">
+  <div class="eyebrow"><span class="n">03</span><span class="b">統計のおもしろ話 ／ 誕生日のパラドックス</span></div>
+  <h2 class="title">23人いれば、誕生日が同じ2人がいる確率は<em>50%</em>を超える</h2>
+  <div class="lead">「1年は365日もあるのに？」― 直感はハズれます。カギは「人数」ではなく<b>「ペアの数」</b>です。</div>
+  <div class="g2">
+    <div class="card pn">
+      <div class="ph"><div><h3>① 実験：1人ずつ部屋に入る</h3><div class="s">1マス＝1年のうちの1日（365マス）</div></div>
+        <div class="r"><span class="txt">入室 <span class="big" id="b_people" style="font-size:28px">0</span> 人</span><button class="bt alt" id="b_pause">一時停止</button></div></div>
+      <div class="bgrid" id="b_grid" role="img" aria-label="365日のマスに誕生日が埋まっていく様子"></div>
+      <div class="st"><span class="m" id="b_status"></span><span class="sm" id="b_hist"></span></div>
+      <div class="txt" id="b_pairsL" style="margin-top:-4px"></div>
+    </div>
+    <div class="card pn">
+      <div class="ph"><div><h3>② 計算：人数を動かす</h3><div class="s">誕生日が同じペアが「少なくとも1組いる」確率</div></div></div>
+      <div class="ro"><span class="big" id="b_n">23</span><span class="u">人なら</span>
+        <span class="big gold" id="b_pct" style="margin-left:14px">50.7</span><span class="u gold" id="b_pu">%</span>
+        <span class="txt mut" style="margin-left:14px">ペアの数 <b class="merc" id="b_pairs" style="font-size:19px">253</b> 組</span></div>
+      <div class="sl"><label for="b_sl">人数</label><input type="range" id="b_sl" min="2" max="70" step="1" value="23" aria-label="人数"><span class="v" id="b_vd" style="min-width:170px;font-family:'Zen Kaku Gothic New';font-size:14px;font-weight:700"></span></div>
+      <svg id="b_chart" viewBox="0 0 540 190" role="img" aria-label="人数ごとの確率の棒グラフ"></svg>
+    </div>
+  </div>
+  <div class="tk3">
+    <div class="card"><h4>人ではなく「ペア」を数える</h4><p>23人だと2人組は253組。1組の一致は1/365でも、253回もチャンスがあれば起きやすい。</p></div>
+    <div class="card"><h4>ペアは人数の2乗で増える</h4><p>人数が2倍になると、ペアは約4倍。41人で90%、57人で99%に達します。</p></div>
+    <div class="card hint"><h4>経営のヒント：「まさか」を疑う</h4><p>偶然の重なりは思うより起きる。トラブルの「まれな一致」も組み合わせの数で考える。</p></div>
+  </div>
+</section>
+
+<!-- ===== 02 モンティ・ホール問題 ===== -->
+<section class="slide ig" id="s2">
+  <div class="eyebrow"><span class="n">04</span><span class="b">統計のおもしろ話 ／ モンティ・ホール問題</span></div>
+  <h2 class="title">ドアを選び直すと、当たる確率は<em>2倍</em>になる</h2>
+  <div class="lead">車は3つのドアのどれか1つ。司会者がハズレを1つ開けたあと、<b>選び直すべき？</b> ― 数学者でさえ間違えた問題です。</div>
+  <div class="g2">
+    <div class="card pn">
+      <div class="ph"><div><h3 id="m_title">① 実験：自分で遊んでみる</h3><div class="s" id="m_sub">ドアをクリックして遊ぶ</div></div>
+        <div class="r"><button class="bt alt" id="m_mode">自動で見る</button><button class="bt pri" id="m_batch">100回まとめて</button></div></div>
+      <div class="doors">
+        <div class="dcol"><button class="door" id="m_d0">1</button><div class="dtag" id="m_t0"></div></div>
+        <div class="dcol"><button class="door" id="m_d1">2</button><div class="dtag" id="m_t1"></div></div>
+        <div class="dcol"><button class="door" id="m_d2">3</button><div class="dtag" id="m_t2"></div></div>
+      </div>
+      <div class="st" style="min-height:38px"><span class="m" id="m_status"></span>
+        <span id="m_choice" style="display:none;gap:8px"><button class="bt alt" id="m_stay">変えない</button><button class="bt pri" id="m_sw">変える</button></span>
+        <button class="bt pri" id="m_again" style="display:none">もう一回</button></div>
+      <div class="hb"><div class="lb merc">変えない</div><div class="tr"><div class="fl" id="m_sb" style="background:#6f8aa6;width:0"></div><div class="th" style="left:33.3%"></div></div><div class="vl" id="m_sv"></div></div>
+      <div class="hb"><div class="lb gold">変える</div><div class="tr"><div class="fl" id="m_wb" style="background:var(--gold);width:0"></div><div class="th" style="left:66.7%"></div></div><div class="vl" id="m_wv"></div></div>
+      <div class="cap">白い縦線＝理論上の当たる確率（変えない 33.3%／変える 66.7%）</div>
+    </div>
+    <div class="card pn">
+      <div class="ph"><div><h3>② しくみ：ドア1を選んだときの3通り</h3><div class="s">車の場所は3通りで、どれも1/3。司会者は必ずヤギを開ける</div></div>
+        <div class="r"><span class="cap" id="k_step">1 / 4</span><button class="bt pri" id="k_next">次へ</button></div></div>
+      <div class="mrow hdr"><span>車の場所</span><span>ドア（1を選択）</span><span>司会者が開ける</span><span class="c">変えない</span><span class="c">変える</span></div>
+      <div class="mrow" id="k_r0"><span class="ml">車がドア1</span><span class="md3"><i class="md">1</i><i class="md">2</i><i class="md">3</i></span><span class="mh" id="k_h0"></span><span class="chip q" id="k_s0">？</span><span class="chip q" id="k_w0">？</span></div>
+      <div class="mrow" id="k_r1"><span class="ml">車がドア2</span><span class="md3"><i class="md">1</i><i class="md">2</i><i class="md">3</i></span><span class="mh" id="k_h1"></span><span class="chip q" id="k_s1">？</span><span class="chip q" id="k_w1">？</span></div>
+      <div class="mrow" id="k_r2"><span class="ml">車がドア3</span><span class="md3"><i class="md">1</i><i class="md">2</i><i class="md">3</i></span><span class="mh" id="k_h2"></span><span class="chip q" id="k_s2">？</span><span class="chip q" id="k_w2">？</span></div>
+      <div class="msum" id="k_sum">
+        <div class="txt"><b class="merc">変えない</b>：当たりは3通り中 <b>1通り</b> → <b class="big merc" style="font-size:24px">1/3</b></div>
+        <div class="txt"><b class="gold">変える</b>：当たりは3通り中 <b>2通り</b> → <b class="big gold" style="font-size:24px">2/3</b></div>
+        <div class="cap" style="font-size:14px;color:var(--paper)">変えて当たるのは「最初にハズレを選んでいたとき」。その確率が2/3です。</div>
+      </div>
+    </div>
+  </div>
+  <div class="tk3">
+    <div class="card"><h4>最初の確率は 1/3 のまま</h4><p>最初に選んだドアが当たる確率は1/3。司会者がドアを開けても、この1/3は増えません。</p></div>
+    <div class="card"><h4>残りの 2/3 が1枚に集まる</h4><p>司会者は車の場所を知っていて必ずヤギを開ける。だから2/3が残った1枚に集まります。</p></div>
+    <div class="card hint"><h4>経営のヒント：判断を更新する</h4><p>「最初に決めたから」と固執しがち。新しい情報が出たら、確率を計算し直そう。</p></div>
+  </div>
+</section>
+
+<!-- ===== 03 偽陽性 ===== -->
+<section class="slide ig" id="s3">
+  <div class="eyebrow"><span class="n">05</span><span class="b">統計のおもしろ話 ／ 検査のパラドックス（偽陽性）</span></div>
+  <h2 class="title">精度の高い検査で「陽性」でも、本当に病気なのは<em>約15%</em></h2>
+  <div class="lead">病気の人を9割見つけ、健康な人の誤りは5%だけ。それでも陽性の<b>8割以上は健康な人</b>です。</div>
+  <div class="g2">
+    <div class="card pn">
+      <div class="ph"><div><h3>① 実験：1000人が検査を受ける</h3><div class="s">1点＝1人。病気の人は1%（10人）</div></div>
+        <div class="r"><span class="cap" id="y_step">1 / 4</span><button class="bt pri" id="y_next">次へ</button></div></div>
+      <div class="ygrid" id="y_grid" role="img" aria-label="1000人の点"></div>
+      <div class="st"><span class="m" id="y_status"></span></div>
+      <div id="y_barw" style="opacity:0;transition:opacity .4s">
+        <div class="stack"><div style="width:15.3%;background:var(--copper)"></div><div style="width:84.7%;background:var(--gold)"></div></div>
+        <div class="st" style="min-height:20px;margin-top:4px"><span class="cap cop" style="font-weight:700">本当に病気 9人</span><span class="cap gold" style="font-weight:700">健康なのに陽性 50人</span></div>
+      </div>
+    </div>
+    <div class="card pn">
+      <div class="ph"><div><h3>② 計算：条件を変えてみる</h3><div class="s">病気の人を見つける力は90%で固定</div></div></div>
+      <div class="sl"><label for="y_prev">もともと病気の人の割合</label><input type="range" id="y_prev" min="1" max="300" step="1" value="10" aria-label="病気の人の割合"><span class="v" id="y_prevv"></span></div>
+      <div class="sl"><label for="y_fpr">健康なのに陽性と出る割合</label><input type="range" id="y_fpr" min="1" max="20" step="0.5" value="5" aria-label="健康な人を陽性と誤る割合"><span class="v" id="y_fprv"></span></div>
+      <div style="margin-top:6px"><div class="txt mut">陽性と出た人が、本当に病気である確率</div>
+        <div class="ro" style="margin-top:6px"><span class="big" id="y_post" style="font-size:52px"></span><span class="u" id="y_postu" style="font-size:22px">%</span></div></div>
+      <div class="cap" style="margin-top:4px">1000人あたりの陽性者の内訳</div>
+      <div class="stack"><div id="y_tp" style="background:var(--copper)"></div><div id="y_fp" style="background:var(--gold)"></div></div>
+      <div class="st" style="min-height:20px"><span class="cap cop" style="font-weight:700" id="y_tpv"></span><span class="cap gold" style="font-weight:700" id="y_fpv"></span></div>
+      <div class="txt" id="y_msg"></div>
+    </div>
+  </div>
+  <div class="tk3">
+    <div class="card"><h4>健康な人が圧倒的に多い</h4><p>990人の5%でも約50人。病気で陽性の9人を、数で大きく上回ります。</p></div>
+    <div class="card"><h4>「もともとの割合」が決め手</h4><p>病気の人の割合が上がるほど、陽性の信頼度は上がる。精度だけでは決まりません。</p></div>
+    <div class="card hint"><h4>経営のヒント：アラートを疑う</h4><p>AIの不正検知や与信の警告も同じ。「もともとの発生率」とセットで判断しよう。</p></div>
+  </div>
+</section>
+
+<!-- ===== 04 平均への回帰 ===== -->
+<section class="slide ig" id="s4">
+  <div class="eyebrow"><span class="n">06</span><span class="b">統計のおもしろ話 ／ 平均への回帰</span></div>
+  <h2 class="title">叱った店は伸び、ほめた店は落ちる。<em>何もしなくても</em></h2>
+  <div class="lead">成績には「実力」と「運」が混ざっています。極端な結果は、翌月には<b>平均の方へ戻りやすい</b>のです。</div>
+  <div class="g2">
+    <div class="card pn">
+      <div class="ph"><div><h3>① 実験：20店の成績を2か月見る</h3><div class="s">今月の下位5店（赤）を叱り、上位5店（金）をほめた</div></div>
+        <div class="r"><button class="bt pri" id="r_go">来月を見る</button><button class="bt alt" id="r_new">別の店で</button></div></div>
+      <svg id="r_svg" viewBox="0 0 540 214" role="img" aria-label="今月と来月の成績をつないだ図"></svg>
+      <div class="st"><span class="m cop" id="r_low"></span></div>
+      <div class="st" style="margin-top:-6px"><span class="m gold" id="r_high"></span></div>
+    </div>
+    <div class="card pn">
+      <div class="ph"><div><h3>② 計算：「運」の割合を変える</h3><div class="s">点数は平均50点・ばらつき10点の成績</div></div></div>
+      <div class="sl"><label for="r_sl">成績のうち運の割合</label><input type="range" id="r_sl" min="0" max="100" step="5" value="50" aria-label="成績のうち運の割合"><span class="v" id="r_v"></span></div>
+      <svg id="r_line" viewBox="0 0 540 150" role="img" aria-label="下位と上位の店の点数の動き"></svg>
+      <div class="txt"><span class="cop" style="font-weight:700">下位2割の店：</span><span id="r_t1"></span></div>
+      <div class="txt"><span class="gold" style="font-weight:700">上位2割の店：</span><span id="r_t2"></span></div>
+      <div class="cap" id="r_t3"></div>
+    </div>
+  </div>
+  <div class="tk3">
+    <div class="card"><h4>極端な結果には「運」が混ざる</h4><p>最下位の月はたまたま運が悪かった月。翌月は運が普通に戻るだけで点が上がります。</p></div>
+    <div class="card"><h4>運の割合が大きいほど戻る</h4><p>運が半分なら、平均との差の半分が翌月には消えます。叱った効果に見えてしまいます。</p></div>
+    <div class="card hint"><h4>経営のヒント：比べる相手を置く</h4><p>施策の効果は、何もしなかった店と比べて確かめる。前後の比較だけでは判断しない。</p></div>
+  </div>
+</section>
+
+<!-- ===== 05 生存者バイアス ===== -->
+<section class="slide ig" id="s5">
+  <div class="eyebrow"><span class="n">07</span><span class="b">統計のおもしろ話 ／ 生存者バイアス</span></div>
+  <h2 class="title">弾の跡が多い所ではなく、<em>跡がない所</em>を守れ</h2>
+  <div class="lead">第二次世界大戦中の有名な話。戻ってきた爆撃機の弾の跡を調べて、<b>どこを補強すべき？</b></div>
+  <div class="g2">
+    <div class="card pn">
+      <div class="ph"><div><h3>① 実験：戻ってきた機体の弾の跡</h3><div class="s">点＝帰還した機体に残っていた弾の跡</div></div>
+        <div class="r"><span class="cap" id="v_cnt"></span></div></div>
+      <svg id="v_svg" viewBox="0 0 540 200" role="img" aria-label="飛行機の弾の跡"></svg>
+      <div class="zb"><span class="txt" style="font-weight:700;white-space:nowrap">どこを補強する？</span>
+        <button class="bt alt" data-z="wing">翼</button><button class="bt alt" data-z="body">胴体</button><button class="bt alt" data-z="tail">尾翼</button><button class="bt alt" data-z="eng">エンジン</button></div>
+      <div class="st"><span class="m" id="v_msg" style="font-size:15px"></span></div>
+    </div>
+    <div class="card pn">
+      <div class="ph"><div><h3>② 計算：見えている被弾と、本当の被弾</h3><div class="s">前提：弾は4か所に同じだけ当たる</div></div></div>
+      <div class="sl"><label for="v_sl">エンジンに当たっても帰れる割合</label><input type="range" id="v_sl" min="0" max="100" step="5" value="25" aria-label="エンジンに当たっても帰還できる割合"><span class="v" id="v_v"></span></div>
+      <div class="lgd" style="flex-direction:row;gap:20px"><div><span style="background:#6f8aa6"></span>撃たれた全機で見た被弾</div><div><span style="background:var(--gold)"></span>帰還機だけで見た被弾</div></div>
+      <div id="v_rows" style="display:flex;flex-direction:column;gap:9px"></div>
+      <div class="txt" id="v_out"></div>
+      <div class="cap">帰還できる割合：翼90%・胴体85%・尾翼75%（説明のための仮定値）</div>
+    </div>
+  </div>
+  <div class="tk3">
+    <div class="card"><h4>見えるのは「生き残り」だけ</h4><p>撃墜された機体は調べられない。データは最初から、帰れた機体に偏っています。</p></div>
+    <div class="card"><h4>跡がない所＝致命傷の場所</h4><p>エンジンに跡が少ないのは、そこを撃たれた機体が帰ってこられなかったからです。</p></div>
+    <div class="card hint"><h4>経営のヒント：去った人の声を聞く</h4><p>成功企業や残った顧客だけを見ない。離れた顧客・失敗例にこそ答えがあります。</p></div>
+  </div>
+</section>
+
+<!-- ===== 06 シンプソンのパラドックス ===== -->
+<section class="slide ig" id="s6">
+  <div class="eyebrow"><span class="n">08</span><span class="b">統計のおもしろ話 ／ シンプソンのパラドックス</span></div>
+  <h2 class="title">種類ごとでは勝っているのに、<em>合計では負ける</em></h2>
+  <div class="lead">営業のAさんとBさん、腕がいいのはどっち？ ― <b>合計の成約率だけで比べると、判断を誤ります。</b></div>
+  <div class="g2">
+    <div class="card pn">
+      <div class="ph"><div><h3 id="p_h3">① 実験：合計で比べると…</h3><div class="s">四角1つ＝案件1件。色付き＝成約、黒＝不成約</div></div>
+        <div class="r"><span class="cap" id="p_step">1 / 3</span><button class="bt pri" id="p_next">次へ</button></div></div>
+      <div class="pbox" id="p_box"></div>
+      <div class="st"><span class="m" id="p_status"></span></div>
+    </div>
+    <div class="card pn">
+      <div class="ph"><div><h3>② しくみ：合計は「件数の多い方」に引っ張られる</h3><div class="s">線の左端＝難しい案件、右端＝簡単な案件の成約率。●＝合計</div></div></div>
+      <svg id="p_svg" viewBox="0 0 540 190" role="img" aria-label="AさんとBさんの成約率の幅と合計の位置"></svg>
+      <div class="sl"><label for="p_sl">Aさんの難しい案件の割合</label><input type="range" id="p_sl" min="10" max="90" step="10" value="90" aria-label="Aさんが担当する難しい案件の割合"><span class="v" id="p_v"></span></div>
+      <div class="txt" id="p_msg" style="font-weight:700"></div>
+      <div class="cap">Bさんは難しい案件が1割だけ。スライダーを10%にすると、2人の条件がそろいます</div>
+    </div>
+  </div>
+  <div class="tk3">
+    <div class="card"><h4>Aさんは難しい案件ばかり</h4><p>100件中90件が難しい案件。だから合計の成約率が下がって見えます。</p></div>
+    <div class="card"><h4>同じ種類どうしで比べる</h4><p>簡単な案件でも難しい案件でも、成約率はAさんの方が上です。</p></div>
+    <div class="card hint"><h4>経営のヒント：評価の落とし穴</h4><p>担当者や店舗の成績は、客層・案件の難しさをそろえてから比べよう。</p></div>
+  </div>
+</section>
+
+<!-- ===== 07 ギャンブラーの誤謬 ===== -->
+<section class="slide ig" id="s7">
+  <div class="eyebrow"><span class="n">09</span><span class="b">統計のおもしろ話 ／ ギャンブラーの誤謬</span></div>
+  <h2 class="title">5回続けて表。それでも次に表が出る確率は<em>1/2</em></h2>
+  <div class="lead">「そろそろ裏が出るはず」は思い込み。コインに<b>記憶はありません</b>。しかも連続は意外とよく起きます。</div>
+  <div class="g2">
+    <div class="card pn">
+      <div class="ph"><div><h3>① 実験：自分でコインを投げる</h3><div class="s">金＝表、青＝裏。最近の40回を表示</div></div>
+        <div class="r"><button class="bt pri" id="c_one">1回投げる</button><button class="bt alt" id="c_100">100回投げる</button></div></div>
+      <div style="display:flex;gap:22px;align-items:center">
+        <div class="coin" id="c_coin">?</div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div class="txt">投げた回数 <b id="c_n" style="font-size:19px">0</b> 回　表の割合 <b class="gold" id="c_hp" style="font-size:19px">—</b></div>
+          <div class="txt">いまの連続：<b id="c_run">—</b>　最長の連続：<b class="cop" id="c_max">—</b></div>
+        </div>
+      </div>
+      <div class="chist" id="c_hist"></div>
+      <div class="txt" style="margin-top:4px;font-weight:700">表が3回以上続いたあと、次に何が出た？</div>
+      <div class="hb"><div class="lb gold">次も表</div><div class="tr"><div class="fl" id="c_ab" style="background:var(--gold);width:0"></div><div class="th" style="left:50%"></div></div><div class="vl" id="c_av"></div></div>
+      <div class="hb"><div class="lb merc">次は裏</div><div class="tr"><div class="fl" id="c_bb" style="background:#6f8aa6;width:0"></div><div class="th" style="left:50%"></div></div><div class="vl" id="c_bv"></div></div>
+      <div class="cap" id="c_note">白い線＝50%。何度か投げると、表と裏がほぼ半々になります</div>
+    </div>
+    <div class="card pn">
+      <div class="ph"><div><h3>② 計算：連続の回数を変える</h3><div class="s">表と裏が1/2ずつのコイン</div></div></div>
+      <div class="sl"><label for="c_sl">連続の回数</label><input type="range" id="c_sl" min="2" max="10" step="1" value="5" aria-label="連続の回数"><span class="v" id="c_v"></span></div>
+      <div style="display:flex;flex-direction:column;gap:14px;margin-top:6px">
+        <div><div class="txt" id="c_l1"></div><div class="hb" style="margin-top:4px"><div class="tr"><div class="fl" id="c_b1" style="background:#6f8aa6"></div></div><div class="vl" style="width:80px"><b id="c_p1"></b></div></div></div>
+        <div><div class="txt" id="c_l2"></div><div class="hb" style="margin-top:4px"><div class="tr"><div class="fl" style="background:var(--gold);width:50%"></div></div><div class="vl" style="width:80px"><b class="gold">50%</b></div></div></div>
+        <div><div class="txt" id="c_l3"></div><div class="hb" style="margin-top:4px"><div class="tr"><div class="fl" id="c_b3" style="background:var(--copper)"></div></div><div class="vl" style="width:80px"><b class="cop" id="c_p3"></b></div></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="tk3">
+    <div class="card"><h4>コインに記憶はない</h4><p>何回表が続いても、次の1回はいつも1/2。過去の結果は次に影響しません。</p></div>
+    <div class="card"><h4>連続は意外とよく起きる</h4><p>100回投げれば、どこかで5回連続の表が出る確率は約8割。珍しくありません。</p></div>
+    <div class="card hint"><h4>経営のヒント：「次こそ」は根拠にならない</h4><p>「不調が続いたから次は良くなる」と待たない。原因を調べて手を打とう。</p></div>
+  </div>
+</section>
+
+<!-- ===== 08 待ち行列 ===== -->
+<section class="slide ig" id="s8">
+  <div class="eyebrow"><span class="n">10</span><span class="b">統計のおもしろ話 ／ 待ち行列</span></div>
+  <h2 class="title">稼働率が80%を超えると、<em>待ち時間は急に伸びる</em></h2>
+  <div class="lead">お客はバラバラに来ます。窓口に余裕がないと、ちょっとした偏りで<b>行列が雪だるま</b>になります。</div>
+  <div class="g2">
+    <div class="card pn">
+      <div class="ph"><div><h3>① 実験：窓口に並ぶお客</h3><div class="s">金の点＝待っているお客</div></div>
+        <div class="r"><button class="bt alt" data-r="50">稼働率50%</button><button class="bt alt" data-r="80">80%</button><button class="bt alt" data-r="95">95%</button></div></div>
+      <div class="qbox" id="q_box"><div class="srv">窓口</div><div class="qmore" id="q_more"></div></div>
+      <div class="st"><span class="m" id="q_now"></span><span class="sm" id="q_rho"></span></div>
+      <div class="st" style="margin-top:-6px"><span class="txt" id="q_avg"></span></div>
+      <div class="hb" style="margin-top:6px"><div class="lb merc" style="width:120px">窓口の空き時間</div><div class="tr"><div class="fl" id="q_ib" style="background:#6f8aa6"></div></div><div class="vl" style="width:70px"><b id="q_iv"></b></div></div>
+      <div class="cap" id="q_inote"></div>
+    </div>
+    <div class="card pn">
+      <div class="ph"><div><h3>② 計算：稼働率と待ち時間</h3><div class="s">待ち時間＝1件の処理時間の何倍か</div></div></div>
+      <div class="sl"><label for="q_sl">稼働率</label><input type="range" id="q_sl" min="10" max="97" step="1" value="80" aria-label="稼働率"><span class="v" id="q_v"></span></div>
+      <div class="ro"><span class="txt">待ち時間は処理時間の</span><span class="big" id="q_w" style="font-size:36px"></span><span class="u">倍</span><span class="txt mut" style="margin-left:12px" id="q_min"></span></div>
+      <svg id="q_svg" viewBox="0 0 540 200" role="img" aria-label="稼働率と待ち時間の曲線"></svg>
+    </div>
+  </div>
+  <div class="tk3">
+    <div class="card"><h4>余裕がないと行列は戻らない</h4><p>空き時間がないので、一度できた行列がなかなか減りません。</p></div>
+    <div class="card"><h4>80%→90%で待ちは2倍以上</h4><p>稼働率80%で処理時間の4倍、90%で9倍、95%で19倍に伸びます。</p></div>
+    <div class="card hint"><h4>経営のヒント：2割の余裕が速さを生む</h4><p>人も機械も「100%稼働」を目標にしない。余裕がお客の満足を守ります。</p></div>
+  </div>
+</section>
+
+<!-- ===== 09 秘書問題 ===== -->
+<section class="slide ig" id="s9">
+  <div class="eyebrow"><span class="n">11</span><span class="b">統計のおもしろ話 ／ 秘書問題（37%ルール）</span></div>
+  <h2 class="title">最良の1人を選ぶなら、<em>最初の37%は見送る</em></h2>
+  <div class="lead">候補者は1人ずつ来て、その場で採否を決める。見送った人は戻らない。<b>いつ決断すべき？</b></div>
+  <div class="g2">
+    <div class="card pn">
+      <div class="ph"><div><h3>① 実験：10人の候補者から選ぶ</h3><div class="s">点数は会うまでわからない。最高点の人を選べたら成功</div></div>
+        <div class="r"><span class="cap" id="h_tally"></span></div></div>
+      <div class="cards" id="h_cards"></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:4px">
+        <div><div class="txt mut" id="h_who"></div><div class="ro"><span class="big gold" id="h_score" style="font-size:44px"></span><span class="u gold">点</span><span class="txt mut" style="margin-left:14px" id="h_best"></span></div></div>
+        <div style="display:flex;gap:8px"><button class="bt alt" id="h_pass">見送る</button><button class="bt pri" id="h_hire">採用する</button><button class="bt pri" id="h_again" style="display:none">もう一度</button></div>
+      </div>
+      <div class="st"><span class="m" id="h_msg" style="font-size:15px"></span></div>
+      <div class="cap">37%ルールなら：最初の3〜4人は見送り、それまでの最高を超えた人を採用</div>
+    </div>
+    <div class="card pn">
+      <div class="ph"><div><h3>② 計算：何人見送るのが一番よい？</h3><div class="s">候補者100人のとき、最高の人を選べる確率</div></div></div>
+      <div class="sl"><label for="h_sl">最初に見送る人数</label><input type="range" id="h_sl" min="0" max="90" step="1" value="37" aria-label="最初に見送る人数"><span class="v" id="h_v"></span></div>
+      <div class="ro"><span class="txt">最高の人を選べる確率</span><span class="big" id="h_p" style="font-size:36px"></span><span class="u" id="h_pu">%</span></div>
+      <svg id="h_svg" viewBox="0 0 540 200" role="img" aria-label="見送る人数と成功率の曲線"></svg>
+    </div>
+  </div>
+  <div class="tk3">
+    <div class="card"><h4>最初は「相場を知る」期間</h4><p>最初の37%は比べる材料を集めるだけ。どんなに良くても採用しません。</p></div>
+    <div class="card"><h4>あとは「最高を超えたら即決」</h4><p>それまでの最高より良い人が来たら迷わず決める。これで成功率は約37%に。</p></div>
+    <div class="card hint"><h4>経営のヒント：決断のルールを先に決める</h4><p>採用・物件・仕入先選び。「比べる期間」と「決める期間」を分けよう。</p></div>
+  </div>
+</section>
+
+<!-- ===== 10 ベンフォードの法則 ===== -->
+<section class="slide ig" id="s10">
+  <div class="eyebrow"><span class="n">12</span><span class="b">統計のおもしろ話 ／ ベンフォードの法則</span></div>
+  <h2 class="title">数字の先頭は「1」が<em>3割</em>。「9」は5%もない</h2>
+  <div class="lead">売上・人口・川の長さ ― 何倍にも伸び縮みする数字は、<b>1から始まるものが圧倒的に多い</b>のです。</div>
+  <div class="g2">
+    <div class="card pn">
+      <div class="ph"><div><h3>① 実験：数字を集めて先頭を数える</h3><div class="s">棒＝集めた数字、金の線＝法則の予想</div></div>
+        <div class="r"><button class="bt act" id="f_nat">自然な数字</button><button class="bt alt" id="f_fake">作った数字</button></div></div>
+      <div class="tick" id="f_tick"></div>
+      <svg id="f_svg" viewBox="0 0 540 196" role="img" aria-label="先頭の数字の分布"></svg>
+      <div class="st"><span class="m" id="f_msg" style="font-size:15px"></span><span class="sm" id="f_n"></span></div>
+    </div>
+    <div class="card pn">
+      <div class="ph"><div><h3>② 計算：でっち上げを見破る</h3><div class="s">人が作った数字は、先頭が1〜9に均等になりがち</div></div></div>
+      <div class="sl"><label for="f_sl">作った数字の割合</label><input type="range" id="f_sl" min="0" max="100" step="5" value="0" aria-label="作った数字の割合"><span class="v" id="f_v"></span></div>
+      <svg id="f_svg2" viewBox="0 0 540 170" role="img" aria-label="混ぜた数字の先頭の分布"></svg>
+      <div class="ro"><span class="txt">1から始まる割合</span><span class="big" id="f_one" style="font-size:30px"></span><span class="txt" style="margin-left:14px">判定</span><span class="big" id="f_jd" style="font-size:26px"></span></div>
+      <div class="cap">判定は、法則とのずれの大きさ（平均の差）で簡易に判断した目安です</div>
+    </div>
+  </div>
+  <div class="tk3">
+    <div class="card"><h4>1→2は「2倍」の道のり</h4><p>100が200になるには2倍の成長が必要。900→1000はすぐ。だから1の時期が長い。</p></div>
+    <div class="card"><h4>作った数字は均等になりがち</h4><p>人が考えた数字は5〜9から始まるものが多くなり、法則から外れます。</p></div>
+    <div class="card hint"><h4>経営のヒント：数字の健康診断</h4><p>経費や売上の明細で「1が少なく、5〜9が多い」なら要確認。不正の発見に使われます。</p></div>
+  </div>
+</section>
+
+<div id="hint">← → SPACE</div>
+<div id="rail"><div id="ticks"></div><div id="counter"></div></div>
+
+</div></div>
+
+<script>
+/* ===========================================================
+   INK-GOLD SLIDES ENGINE  —  このscriptは書き換えないこと
+   スライド固有の初期化は最下部の「作品ごとの設定」だけに書く
+   =========================================================== */
+var AL = (function(){
+"use strict";
+var RM = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+var C = {gold:"#d9b449", goldDim:"#8f7530", merc:"#a8bccf", mercDim:"#5b6f82",
+         paper:"#ece7dc", muted:"#7f8c9b", copper:"#c05b38", raise:"#131d2c",
+         line:"rgba(168,188,207,.35)", faint:"rgba(168,188,207,.18)"};
+var api = {C:C, RM:RM, onShow:{}};
+
+/* ---------- ステージ ---------- */
+var stage, slides, idx=0, tEls=[], counter;
+function fit(){
+  var s = Math.min(window.innerWidth/1280, window.innerHeight/720);
+  stage.style.transform = "scale("+s+")";
+}
+function pad(n){ return (n<10?"0":"")+n; }
+function show(n){
+  n = Math.max(0, Math.min(slides.length-1, n));
+  slides[idx].classList.remove("on");
+  idx = n; slides[idx].classList.add("on");
+  tEls.forEach(function(el,i){ el.className = "t"+(i<idx?" done":i===idx?" cur":""); });
+  counter.innerHTML = "<b>"+pad(idx+1)+"</b> / "+pad(slides.length);
+  if(api.onShow[idx]) api.onShow[idx]();
+}
+api.show = show;
+api.go = function(d){ show(idx+d); };
+api.init = function(){
+  stage = document.getElementById("stage");
+  slides = Array.prototype.slice.call(document.querySelectorAll(".slide"));
+  counter = document.getElementById("counter");
+  var ticks = document.getElementById("ticks");
+  slides.forEach(function(){ var d=document.createElement("div"); d.className="t"; ticks.appendChild(d); });
+  tEls = Array.prototype.slice.call(ticks.children);
+  window.addEventListener("resize", fit); fit();
+  document.addEventListener("keydown", function(e){
+    if(e.key==="ArrowRight"||e.key===" "||e.key==="PageDown"){ e.preventDefault(); show(idx+1); }
+    else if(e.key==="ArrowLeft"||e.key==="PageUp"){ e.preventDefault(); show(idx-1); }
+    else if(e.key==="Home"){ show(0); }
+    else if(e.key==="End"){ show(slides.length-1); }
+    else if(e.key==="f"||e.key==="F"){
+      if(document.fullscreenElement) document.exitFullscreen();
+      else document.documentElement.requestFullscreen();
+    }
+  });
+  stage.addEventListener("click", function(e){
+    if(e.target.closest("button,input,li,.card")) return;
+    var r = stage.getBoundingClientRect();
+    show(idx + ((e.clientX-r.left)/r.width < 0.28 ? -1 : 1));
+  });
+  var sx=null;
+  stage.addEventListener("touchstart", function(e){ sx=e.touches[0].clientX; }, {passive:true});
+  stage.addEventListener("touchend", function(e){
+    if(sx===null) return;
+    var d = e.changedTouches[0].clientX - sx;
+    if(Math.abs(d)>60) show(idx + (d<0?1:-1));
+    sx=null;
+  }, {passive:true});
+  show(0);
+};
+
+/* ---------- 共通ユーティリティ ---------- */
+function el(id){ return document.getElementById(id.replace(/^#/,"")); }
+function vb(svg){ return svg.getAttribute("viewBox").split(" ").map(Number); }
+function marker(id,color){
+  return '<marker id="'+id+'" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" '+
+         'orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="'+color+'"/></marker>';
+}
+function box(x,y,w,h,lines,size,color){
+  var g = '<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" fill="'+C.raise+'" stroke="'+C.line+'"/>';
+  lines.forEach(function(t,k){
+    g += '<text x="'+(x+w/2)+'" y="'+(y+h/2 - (lines.length-1)*(size*0.62) + k*(size*1.25) + size*0.36)+'" '+
+         'text-anchor="middle" fill="'+(color||C.paper)+'" font-family="Zen Old Mincho, serif" '+
+         'font-size="'+size+'" font-weight="700">'+t+'</text>';
+  });
+  return g;
+}
+api.el = el;
+
+/* ---------- ブーム・バースト型カーブのモデル ---------- */
+function ss(a,b,t){ if(t<=a)return 0; if(t>=b)return 1; var x=(t-a)/(b-a); return x*x*(3-2*x); }
+function sp(a,b,t,p){ if(t<=a)return 0; if(t>=b)return 1; return Math.pow((t-a)/(b-a),p); }
+function gs(t,m,s){ return Math.exp(-Math.pow((t-m)/s,2)); }
+var NP = 300;
+function series(b){
+  var E=[],P=[],i,t,e,m;
+  for(i=0;i<=NP;i++){
+    t=i/NP;
+    e = 1 + 0.40*t + b*(1.05*ss(0.22,0.64,t) - 1.55*sp(0.66,0.94,t,1.6));
+    m = 1 + b*(1.00*ss(0.16,0.68,t) - 1.40*sp(0.70,0.92,t,2.0)) - 0.18*b*gs(t,0.36,0.035);
+    e = Math.max(e,0.15);
+    E.push(e); P.push(Math.max(e*m,0.10));
+  }
+  return {E:E,P:P};
+}
+function pathOf(arr,bx,yMax){
+  var d="",i,x,y;
+  for(i=0;i<arr.length;i++){
+    x = bx.x + bx.w*(i/NP);
+    y = bx.y + bx.h*(1-arr[i]/yMax);
+    d += (i===0?"M":"L")+x.toFixed(1)+","+y.toFixed(1);
+  }
+  return d;
+}
+api.series = series;
+
+/* =====  A. 表紙の背景カーブ  ===== */
+api.hero = function(id, bias){
+  var svg = el(id); if(!svg) return;
+  var s = series(bias||0.85);
+  var bx = {x:-60,y:120,w:1400,h:560};
+  var yMax = Math.max.apply(null,s.P)*1.06;
+  svg.innerHTML =
+    '<path d="'+pathOf(s.E,bx,yMax)+'" fill="none" stroke="'+C.mercDim+'" stroke-width="2" stroke-dasharray="7 7" opacity=".8"/>'+
+    '<path id="'+svg.id+'_p" d="'+pathOf(s.P,bx,yMax)+'" fill="none" stroke="'+C.gold+'" stroke-width="3" opacity=".9"/>';
+  if(RM) return;
+  var hp = svg.querySelector("#"+svg.id+"_p"), L = hp.getTotalLength();
+  hp.style.strokeDasharray = L; hp.style.strokeDashoffset = L;
+  hp.animate([{strokeDashoffset:L},{strokeDashoffset:0}],
+    {duration:4200,easing:"cubic-bezier(.3,.05,.2,1)",fill:"forwards",delay:400});
+};
+
+/* =====  B. ブーム・バースト曲線（スライダー＋局面連動）  ===== */
+api.curve = function(id, o){
+  var svg = el(id); if(!svg) return;
+  var V = vb(svg);
+  var bx = o.box || {x:56,y:26,w:V[2]-88,h:V[3]-82};
+  var bias = o.bias!==undefined ? o.bias : 0.80;
+  var phaseEls = o.phaseList ? Array.prototype.slice.call(document.querySelectorAll(o.phaseList+" li")) : [];
+  var peakIndex = o.peakIndex!==undefined ? o.peakIndex : 5;
+
+  function draw(b, prog){
+    var s = series(b), i, mx=-1, mi=0;
+    for(i=0;i<s.P.length;i++){ if(s.P[i]>mx){ mx=s.P[i]; mi=i; } }
+    if(phaseEls[peakIndex]) phaseEls[peakIndex].dataset.t = (mi/NP).toFixed(2);
+    var yMax = mx*1.10, marks="";
+    phaseEls.forEach(function(li,k){
+      var t = parseFloat(li.dataset.t), x = bx.x+bx.w*t, hot = li.classList.contains("hot");
+      marks += '<line x1="'+x.toFixed(1)+'" y1="'+bx.y+'" x2="'+x.toFixed(1)+'" y2="'+(bx.y+bx.h)+'" stroke="'+
+        (hot?C.gold:C.faint)+'" stroke-width="'+(hot?1.4:1)+'"'+(hot?'':' stroke-dasharray="3 5"')+'/>'+
+        '<text x="'+x.toFixed(1)+'" y="'+(bx.y-8)+'" text-anchor="middle" fill="'+(hot?C.gold:"#4a5866")+
+        '" font-family="IBM Plex Mono, monospace" font-size="10">'+(k+1)+'</text>';
+    });
+    var dd = (1 - s.P[NP]/mx)*100, cw = bx.w*prog;
+    svg.innerHTML =
+      '<defs><clipPath id="'+svg.id+'_c"><rect x="'+bx.x+'" y="0" width="'+cw.toFixed(1)+'" height="'+V[3]+'"/></clipPath></defs>'+
+      '<line x1="'+bx.x+'" y1="'+(bx.y+bx.h)+'" x2="'+(bx.x+bx.w)+'" y2="'+(bx.y+bx.h)+'" stroke="'+C.line+'"/>'+
+      '<line x1="'+bx.x+'" y1="'+bx.y+'" x2="'+bx.x+'" y2="'+(bx.y+bx.h)+'" stroke="'+C.line+'"/>'+
+      '<text x="'+(bx.x-10)+'" y="'+(bx.y+8)+'" text-anchor="end" fill="#4a5866" font-family="IBM Plex Mono, monospace" font-size="10">高</text>'+
+      '<text x="'+(bx.x+bx.w)+'" y="'+(bx.y+bx.h+20)+'" text-anchor="end" fill="#4a5866" font-family="IBM Plex Mono, monospace" font-size="10">時間 →</text>'+
+      marks+
+      '<g clip-path="url(#'+svg.id+'_c)">'+
+        '<path d="'+pathOf(s.E,bx,yMax)+'" fill="none" stroke="'+C.merc+'" stroke-width="2.2" stroke-dasharray="7 6"/>'+
+        '<path d="'+pathOf(s.P,bx,yMax)+'" fill="none" stroke="'+C.gold+'" stroke-width="3"/>'+
+      '</g>'+
+      '<text x="'+(bx.x+bx.w+6)+'" y="'+(bx.y+bx.h*(1-s.P[NP]/yMax)+4)+'" fill="'+C.goldDim+'" font-family="IBM Plex Mono, monospace" font-size="10">'+(o.labelA||"実線")+'</text>'+
+      '<text x="'+(bx.x+bx.w+6)+'" y="'+(bx.y+bx.h*(1-s.E[NP]/yMax)+4)+'" fill="'+C.mercDim+'" font-family="IBM Plex Mono, monospace" font-size="10">'+(o.labelB||"破線")+'</text>'+
+      (o.showDrawdown===false?"":
+        '<text x="'+(bx.x+8)+'" y="'+(bx.y+bx.h-10)+'" fill="'+C.copper+'" font-family="IBM Plex Mono, monospace" font-size="11">頂点からの下落　-'+dd.toFixed(0)+'%</text>')+
+      (prog<1 ? '<circle cx="'+(bx.x+cw).toFixed(1)+'" cy="'+
+        (bx.y+bx.h*(1-s.P[Math.round(NP*prog)]/yMax)).toFixed(1)+'" r="5.5" fill="'+C.gold+'"/>' : '');
+  }
+
+  if(o.range){
+    var r = el(o.range), v = o.value ? el(o.value) : null;
+    r.value = Math.round(bias*100);
+    if(v) v.textContent = bias.toFixed(2);
+    r.addEventListener("input", function(e){
+      bias = parseInt(e.target.value,10)/100;
+      if(v) v.textContent = bias.toFixed(2);
+      draw(bias,1);
+    });
+  }
+  phaseEls.forEach(function(li){
+    li.addEventListener("mouseenter", function(){
+      phaseEls.forEach(function(x){ x.classList.remove("hot"); });
+      li.classList.add("hot"); draw(bias,1);
+    });
+    li.addEventListener("mouseleave", function(){ li.classList.remove("hot"); draw(bias,1); });
+  });
+  if(o.play){
+    el(o.play).addEventListener("click", function(){
+      if(RM){ draw(bias,1); return; }
+      var t0=null, dur=o.playMs||8000;
+      (function step(ts){
+        if(t0===null) t0=ts;
+        var u = Math.min(1,(ts-t0)/dur);
+        phaseEls.forEach(function(li){
+          var t = parseFloat(li.dataset.t);
+          li.classList.toggle("hot", u>=t && u<t+0.13);
+        });
+        draw(bias,u);
+        if(u<1) requestAnimationFrame(step);
+        else phaseEls.forEach(function(li){ li.classList.remove("hot"); });
+      })(performance.now());
+    });
+  }
+  draw(bias,1);
+  return {redraw:function(){ draw(bias,1); }};
+};
+
+/* =====  C. 双方向ループ（2ボックス＋往復矢印＋段階切替）  ===== */
+/* states: [{left,right,topLabel,topSub,botLabel,botSub,width,color,dimBottom,bar,barLabel,note,button}] */
+api.duo = function(id, o){
+  var svg = el(id); if(!svg) return;
+  var V = vb(svg), W = V[2];
+  var bw = o.boxW || 200, bh = o.boxH || 66;
+  var lx = o.padX || 34, rx = W - lx - bw;
+  var hasTop = o.states.some(function(x){ return !!x.topLabel; });
+  var top = o.top!==undefined ? o.top : (hasTop ? 100 : 40);
+  var dotAnim = o.dots !== false;
+  var cur = 0;
+
+  function render(k){
+    var s = o.states[k];
+    var col = s.color || C.gold, w = s.width || 2.5;
+    var g = '<defs>'+marker(svg.id+"_a", col)+'</defs>';
+    g += box(lx, top, bw, bh, [s.left], o.boxFont||20);
+    g += box(rx, top, bw, bh, [s.right], o.boxFont||20);
+    if(s.leftSub) g += '<text x="'+(lx+bw/2)+'" y="'+(top+bh+18)+'" text-anchor="middle" fill="'+C.muted+'" font-family="IBM Plex Mono, monospace" font-size="11" letter-spacing="1.4">'+s.leftSub+'</text>';
+    if(s.rightSub) g += '<text x="'+(rx+bw/2)+'" y="'+(top+bh+18)+'" text-anchor="middle" fill="'+C.muted+'" font-family="IBM Plex Mono, monospace" font-size="11" letter-spacing="1.4">'+s.rightSub+'</text>';
+    var x1 = lx+bw, x2 = rx, midx = (x1+x2)/2;
+    var yT = top+bh*0.24, yB = top+bh*0.76, arc = o.arc||44;
+    var co = (x2-x1)*0.18;
+    var pT = "M"+x1+","+yT+" C "+(midx-co)+","+(yT-arc)+" "+(midx+co)+","+(yT-arc)+" "+x2+","+yT;
+    var pB = "M"+x2+","+yB+" C "+(midx+co)+","+(yB+arc)+" "+(midx-co)+","+(yB+arc)+" "+x1+","+yB;
+    g += '<path id="'+svg.id+'_pt" d="'+pT+'" fill="none" stroke="'+col+'" stroke-width="'+w+'" marker-end="url(#'+svg.id+'_a)"/>';
+    g += '<g id="'+svg.id+'_gb" opacity="'+(s.dimBottom?0.18:1)+'">'+
+         '<path id="'+svg.id+'_pb" d="'+pB+'" fill="none" stroke="'+(s.botColor||col)+'" stroke-width="'+w+'" marker-end="url(#'+svg.id+'_a)"/></g>';
+    if(s.topLabel){
+      g += '<text x="'+midx+'" y="'+(yT-arc-16)+'" text-anchor="middle" fill="'+col+'" font-family="Zen Kaku Gothic New, sans-serif" font-size="16" font-weight="700">'+s.topLabel+'</text>';
+      if(s.topSub) g += '<text x="'+midx+'" y="'+(yT-arc+4)+'" text-anchor="middle" fill="'+C.goldDim+'" font-family="IBM Plex Mono, monospace" font-size="11">'+s.topSub+'</text>';
+    }
+    if(s.botLabel){
+      g += '<text x="'+midx+'" y="'+(yB+arc+30)+'" text-anchor="middle" fill="'+(s.botColor||col)+'" font-family="Zen Kaku Gothic New, sans-serif" font-size="16" font-weight="700" opacity="'+(s.dimBottom?0.3:1)+'">'+s.botLabel+'</text>';
+      if(s.botSub) g += '<text x="'+midx+'" y="'+(yB+arc+52)+'" text-anchor="middle" fill="'+C.mercDim+'" font-family="IBM Plex Mono, monospace" font-size="11" opacity="'+(s.dimBottom?0.3:1)+'">'+s.botSub+'</text>';
+    }
+    if(s.bar!==undefined){
+      var by = o.barY || (top+bh+96);
+      g += '<text x="'+(W/2)+'" y="'+(by-16)+'" text-anchor="middle" fill="'+C.muted+'" font-family="IBM Plex Mono, monospace" font-size="11" letter-spacing="1.5">'+(o.barCaption||"LEVEL")+'</text>';
+      g += '<rect x="'+(W*0.22)+'" y="'+by+'" width="'+(W*0.56)+'" height="18" fill="rgba(168,188,207,.12)"/>';
+      g += '<rect x="'+(W*0.22)+'" y="'+by+'" width="'+(W*0.56*s.bar).toFixed(0)+'" height="18" fill="'+col+'"/>';
+      if(s.barLabel) g += '<text x="'+(W*0.22)+'" y="'+(by+42)+'" fill="'+C.muted+'" font-family="Zen Kaku Gothic New, sans-serif" font-size="13">'+s.barLabel+'</text>';
+    }
+    g += '<circle id="'+svg.id+'_d1" r="6" fill="'+col+'"/><circle id="'+svg.id+'_d2" r="6" fill="'+(s.botColor||col)+'" opacity="'+(s.dimBottom?0:1)+'"/>';
+    svg.innerHTML = g;
+    if(o.note && s.note) el(o.note).innerHTML = s.note;
+  }
+
+  function tick(){
+    var p1 = svg.querySelector("#"+svg.id+"_pt"), p2 = svg.querySelector("#"+svg.id+"_pb");
+    var d1 = svg.querySelector("#"+svg.id+"_d1"), d2 = svg.querySelector("#"+svg.id+"_d2");
+    if(!p1||!d1) return;
+    var u = (performance.now()%2600)/2600, pt;
+    pt = p1.getPointAtLength(p1.getTotalLength()*u); d1.setAttribute("cx",pt.x); d1.setAttribute("cy",pt.y);
+    if(p2&&d2){ pt = p2.getPointAtLength(p2.getTotalLength()*u); d2.setAttribute("cx",pt.x); d2.setAttribute("cy",pt.y); }
+    requestAnimationFrame(tick);
+  }
+
+  render(0);
+  if(dotAnim && !RM) requestAnimationFrame(tick);
+
+  if(o.buttons){
+    var wrap = el(o.buttons);
+    o.states.forEach(function(s,k){
+      var b = document.createElement("button");
+      b.className = "btn"+(k===0?" act":"");
+      b.textContent = s.button || ("状態"+(k+1));
+      b.addEventListener("click", function(){
+        Array.prototype.slice.call(wrap.children).forEach(function(x){ x.classList.remove("act"); });
+        b.classList.add("act"); cur=k; render(k);
+      });
+      wrap.appendChild(b);
+    });
+  }
+  return {set:render};
+};
+
+/* =====  D. 円環図（3〜6ノードの循環）  ===== */
+api.ring = function(id, nodes, o){
+  o = o||{};
+  var svg = el(id); if(!svg) return;
+  var V = vb(svg), cx = V[2]/2, cy = V[3]/2 + (o.dy||0);
+  var rx = o.rx || V[2]*0.33, ry = o.ry || V[3]*0.33;
+  var col = o.color || C.gold, mid = svg.id+"_a", n = nodes.length;
+  var pts = nodes.map(function(_,i){
+    var a = -Math.PI/2 + i*2*Math.PI/n;
+    return {x:cx+rx*Math.cos(a), y:cy+ry*Math.sin(a)};
+  });
+  var g = '<ellipse cx="'+cx+'" cy="'+cy+'" rx="'+rx+'" ry="'+ry+'" fill="none" stroke="'+
+          (o.ringColor||C.goldDim)+'" stroke-width="1.6" stroke-dasharray="4 6" opacity=".65"/>';
+  pts.forEach(function(p,i){
+    var q = pts[(i+1)%n], m = {x:(p.x+q.x)/2,y:(p.y+q.y)/2};
+    var a = Math.atan2(q.y-p.y,q.x-p.x), L = 12;
+    g += '<path d="M'+(m.x-L*Math.cos(a))+','+(m.y-L*Math.sin(a))+' L'+(m.x+L*Math.cos(a))+','+(m.y+L*Math.sin(a))+
+         '" stroke="'+col+'" stroke-width="2" marker-end="url(#'+mid+')"/>';
+  });
+  pts.forEach(function(p,i){
+    var lines = nodes[i].split("\n"), bw = o.bw||132, bh = 20+lines.length*20;
+    g += '<rect x="'+(p.x-bw/2)+'" y="'+(p.y-bh/2)+'" width="'+bw+'" height="'+bh+'" fill="'+C.raise+'" stroke="'+C.line+'"/>';
+    lines.forEach(function(t,k){
+      g += '<text x="'+p.x+'" y="'+(p.y-bh/2+26+k*20)+'" text-anchor="middle" fill="'+C.paper+
+           '" font-family="Zen Kaku Gothic New, sans-serif" font-size="14">'+t+'</text>';
+    });
+  });
+  svg.innerHTML = '<defs>'+marker(mid,col)+'</defs>'+g+'<circle id="'+svg.id+'_d" r="6" fill="'+col+'"/>';
+  var dot = svg.querySelector("#"+svg.id+"_d");
+  if(RM){ dot.setAttribute("cx",pts[0].x); dot.setAttribute("cy",pts[0].y); return; }
+  var t0=null, per = o.period||6000;
+  (function step(ts){
+    if(t0===null) t0=ts;
+    var a = -Math.PI/2 + ((ts-t0)/per)*2*Math.PI;
+    dot.setAttribute("cx", cx+rx*Math.cos(a));
+    dot.setAttribute("cy", cy+ry*Math.sin(a));
+    requestAnimationFrame(step);
+  })(performance.now());
+};
+
+/* =====  E. 小ループの群れ（4項目の自己強化）  ===== */
+api.mini = function(containerId, items, o){
+  o = o||{};
+  var wrap = el(containerId); if(!wrap) return;
+  wrap.style.display = "grid";
+  wrap.style.gridTemplateColumns = "repeat("+items.length+",1fr)";
+  wrap.style.gap = "18px";
+  items.forEach(function(d,i){
+    var c = document.createElement("div");
+    c.className = "card"; c.style.padding = "18px 16px 20px";
+    c.innerHTML =
+      '<h3 style="font-size:19px;margin-bottom:8px">'+d.title+'</h3>'+
+      '<svg viewBox="0 0 200 130" style="width:100%;height:auto">'+
+      '<defs>'+marker("mn"+i, C.gold)+'</defs>'+
+      '<circle cx="100" cy="65" r="46" fill="none" stroke="'+C.goldDim+'" stroke-width="1.4" stroke-dasharray="4 6" opacity=".7"/>'+
+      '<path d="M138,52 L146,66" stroke="'+C.gold+'" stroke-width="2" marker-end="url(#mn'+i+')"/>'+
+      '<circle class="mnDot" cx="100" cy="19" r="5" fill="'+C.gold+'"/></svg>'+
+      '<p style="font-size:13px;line-height:1.7;margin-top:6px">'+d.chain+'</p>';
+    wrap.appendChild(c);
+  });
+  if(RM) return;
+  var dots = Array.prototype.slice.call(wrap.querySelectorAll(".mnDot")), t0=null;
+  (function step(ts){
+    if(t0===null) t0=ts;
+    dots.forEach(function(dt,i){
+      var a = -Math.PI/2 + ((ts-t0)/(5200+i*400))*2*Math.PI;
+      dt.setAttribute("cx", 100+46*Math.cos(a));
+      dt.setAttribute("cy", 65+46*Math.sin(a));
+    });
+    requestAnimationFrame(step);
+  })(performance.now());
+};
+
+/* =====  F. 非対称バー（上りは緩やか・下りは速い）  ===== */
+api.race = function(id, o){
+  var svg = el(id); if(!svg) return;
+  var V = vb(svg), x0 = o.x0||90, w = V[2]-x0-50;
+  function draw(u,d){
+    svg.innerHTML =
+      '<text x="'+(x0-14)+'" y="42" text-anchor="end" fill="'+C.merc+'" font-family="Zen Kaku Gothic New, sans-serif" font-size="14">'+(o.upLabel||"上昇")+'</text>'+
+      '<text x="'+(x0-14)+'" y="102" text-anchor="end" fill="'+C.copper+'" font-family="Zen Kaku Gothic New, sans-serif" font-size="14">'+(o.downLabel||"下落")+'</text>'+
+      '<line x1="'+x0+'" y1="37" x2="'+(x0+w)+'" y2="37" stroke="rgba(168,188,207,.15)" stroke-width="8"/>'+
+      '<line x1="'+x0+'" y1="97" x2="'+(x0+w)+'" y2="97" stroke="rgba(192,91,56,.15)" stroke-width="8"/>'+
+      '<line x1="'+x0+'" y1="37" x2="'+(x0+w*u)+'" y2="37" stroke="'+C.merc+'" stroke-width="8"/>'+
+      '<line x1="'+x0+'" y1="97" x2="'+(x0+w*d)+'" y2="97" stroke="'+C.copper+'" stroke-width="8"/>'+
+      '<text x="'+(x0+w)+'" y="20" text-anchor="end" fill="#4a5866" font-family="IBM Plex Mono, monospace" font-size="10">'+(o.axis||"同じ値幅を動くのにかかる時間 →")+'</text>';
+  }
+  var ratio = o.ratio || 0.22;
+  draw(0,0);
+  if(o.button){
+    el(o.button).addEventListener("click", function(){
+      if(RM){ draw(1,ratio); return; }
+      var t0=null;
+      (function step(ts){
+        if(t0===null) t0=ts;
+        var e = ts-t0;
+        draw(Math.min(1,e/3400), e>3600 ? Math.min(1,(e-3600)/(3400*ratio))*ratio : 0);
+        if(e<3600+3400*ratio+400) requestAnimationFrame(step);
+      })(performance.now());
+    });
+  }
+  return {reset:function(){ draw(0,0); }};
+};
+
+/* =====  G. 順次点灯フロー  ===== */
+api.flow = function(containerId, btnId, o){
+  o = o||{};
+  var wrap = el(containerId); if(!wrap) return;
+  var steps = Array.prototype.slice.call(wrap.querySelectorAll(".card"));
+  var arws = Array.prototype.slice.call(wrap.querySelectorAll(".arw"));
+  var running = false;
+  el(btnId).addEventListener("click", function(){
+    if(running) return; running = true;
+    steps.forEach(function(s){ s.style.opacity=".45"; s.style.borderTopColor="var(--gold-dim)"; });
+    arws.forEach(function(a){ a.style.color="var(--mercury-dim)"; });
+    var k=0, iv = setInterval(function(){
+      if(k>0 && arws[k-1]) arws[k-1].style.color = C.gold;
+      steps[k].style.opacity = "1";
+      steps[k].style.borderTopColor = "var(--gold)";
+      k++;
+      if(k>=steps.length){ clearInterval(iv); setTimeout(function(){ running=false; }, 400); }
+    }, RM?1:(o.interval||600));
+  });
+};
+
+return api;
+})();
+
+/* ===========================================================
+   作品ごとの設定 — 統計のおもしろ話 10選
+   =========================================================== */
+var GOLD="#d9b449", MERC="#a8bccf", BLUE="#6f8aa6", COP="#e06a45", DIM="#2a2c31", MUTED="#7f8c9b", PAPER="#ece7dc", FAINT="#3a3d44";
+function $(id){ return document.getElementById(id); }
+function isOn(id){ var e=$(id); return !!(e && e.classList.contains("on")); }
+function pct(x,d){ return (x*100).toFixed(d===undefined?1:d)+"%"; }
+function T(x,y,s,o){ o=o||{}; return '<text x="'+x+'" y="'+y+'" fill="'+(o.c||MUTED)+'" font-size="'+(o.fs||13)+'"'+
+  (o.a?' text-anchor="'+o.a+'"':'')+(o.w?' font-weight="'+o.w+'"':'')+' font-family="'+(o.f||"Zen Kaku Gothic New, sans-serif")+'">'+s+'</text>'; }
+function rng(seed){ return function(){ seed|=0; seed=seed+0x6D2B79F5|0; var t=Math.imul(seed^seed>>>15,1|seed);
+  t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+function gauss(r){ r=r||Math.random; var u=1-r(), v=r(); return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v); }
+function sample(n,k,r){ var a=[],i; for(i=0;i<n;i++)a.push(i); for(i=0;i<k;i++){ var j=i+Math.floor(r()*(n-i)); var t=a[i];a[i]=a[j];a[j]=t; } return a.slice(0,k); }
+
+/* ---------- 表紙：点が積み上がって山の形になる ---------- */
+(function(){
+  var svg=$("cv_svg"), B=21, N=230, cnt=[], drops=[], total=0, C=[1];
+  for(var i=1;i<B;i++) C.push(C[i-1]*(B-i)/i);
+  function X(b){ return 20+b*(480/(B-1)); }
+  var Y0=400, DY=9.2;
+  function reset(){ cnt=[]; for(var i=0;i<B;i++) cnt.push(0); drops=[]; total=0; }
+  reset();
+  function expected(){
+    var d="", i; for(i=0;i<B;i++){ var h=N*C[i]/Math.pow(2,B-1); d+=(i?"L":"M")+X(i).toFixed(1)+","+(Y0-h*DY+4).toFixed(1); }
+    return '<path d="'+d+'" fill="none" stroke="'+MUTED+'" stroke-width="1.5" stroke-dasharray="5 6"/>';
+  }
+  var exp=expected();
+  setInterval(function(){
+    if(!isOn("s0")) return;
+    if(total>=N){ if(drops.length===0){ total++; if(total>N+40) reset(); } return; }
+    var b=0; for(var k=0;k<B-1;k++) if(Math.random()<0.5) b++;
+    drops.push({b:b,t0:performance.now()}); total++;
+  },70);
+  function frame(now){
+    if(isOn("s0")){
+      var g='<line x1="10" y1="'+(Y0+8)+'" x2="510" y2="'+(Y0+8)+'" stroke="'+FAINT+'"/>'+exp;
+      var keep=[];
+      drops.forEach(function(d){ var u=(now-d.t0)/650;
+        if(u>=1){ cnt[d.b]++; return; }
+        keep.push(d); var tx=X(d.b), ty=Y0-cnt[d.b]*DY, e=u*u;
+        g+='<circle cx="'+(260+(tx-260)*u).toFixed(1)+'" cy="'+(10+(ty-10)*e).toFixed(1)+'" r="4.2" fill="'+GOLD+'"/>'; });
+      drops=keep;
+      for(var b=0;b<B;b++) for(var j=0;j<cnt[b];j++)
+        g+='<circle cx="'+X(b).toFixed(1)+'" cy="'+(Y0-j*DY).toFixed(1)+'" r="4.2" fill="'+BLUE+'"/>';
+      svg.innerHTML=g;
+    }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+
+/* ---------- 01 誕生日のパラドックス ---------- */
+(function(){
+  var grid=$("b_grid"), cells=[], i;
+  for(i=0;i<375;i++){ var c=document.createElement("div"); c.className="bc"; if(i>=365)c.style.visibility="hidden"; grid.appendChild(c); cells.push(c); }
+  var counts, people, last, phase, wait, hist=[], paused=false;
+  function reset(){ counts=[]; for(var k=0;k<365;k++)counts.push(0); people=0; last=-1; phase="run"; wait=0;
+    for(var k=0;k<365;k++) cells[k].className="bc"; upd(); }
+  function upd(){
+    $("b_people").textContent=people;
+    $("b_pairsL").innerHTML="いま部屋の中の2人組：<b class='gold' style='font-size:19px'>"+(people*(people-1)/2)+"組</b>";
+    var st=$("b_status");
+    if(phase==="hit"){ var dt=new Date(2025,0,1+last); st.textContent=people+"人目で一致！ "+(dt.getMonth()+1)+"月"+dt.getDate()+"日生まれが2人"; st.style.color=COP; }
+    else { st.textContent="まだ誰も同じ誕生日ではありません…"; st.style.color=MERC; }
+    if(hist.length){ var s=0; hist.forEach(function(h){s+=h;}); $("b_hist").textContent="これまで"+hist.length+"回：平均 "+(s/hist.length).toFixed(1)+" 人で一致"; }
+  }
+  function tick(){
+    if(!isOn("s1")||paused) return;
+    if(phase==="hit"){ if(++wait>7) reset(); return; }
+    if(last>=0 && cells[last].className.indexOf("hit")<0) cells[last].className="bc one";
+    var d=Math.floor(Math.random()*365); counts[d]++; people++; last=d;
+    if(counts[d]>=2){ cells[d].className="bc hit"; phase="hit"; wait=0; hist.push(people); }
+    else cells[d].className="bc one last";
+    upd();
+  }
+  $("b_pause").addEventListener("click",function(){ paused=!paused; this.textContent=paused?"再開":"一時停止"; });
+  reset(); setInterval(tick,380);
+
+  var P=[0], q=1; for(var k=1;k<=70;k++){ q*=(365-(k-1))/365; P.push(1-q); }
+  var sl=$("b_sl");
+  function draw(){
+    var n=+sl.value, p=P[n];
+    $("b_n").textContent=n; $("b_pct").textContent=(p*100).toFixed(1); $("b_pairs").textContent=n*(n-1)/2;
+    var over=p>=0.5; $("b_pct").style.color=over?GOLD:PAPER; $("b_pu").style.color=over?GOLD:PAPER;
+    $("b_vd").textContent=over?"半分以上の確率で「いる」":"まだ半分未満"; $("b_vd").style.color=over?GOLD:MUTED;
+    var x0=48, x1=530, y0=12, y1=152, bw=(x1-x0)/70, g="";
+    g+=T(40,y0+5,"100%",{a:"end"})+T(40,(y0+y1)/2+5,"50%",{a:"end"})+T(40,y1+4,"0%",{a:"end"});
+    g+='<line x1="'+x0+'" y1="'+(y0+y1)/2+'" x2="'+x1+'" y2="'+(y0+y1)/2+'" stroke="'+MUTED+'" stroke-dasharray="4 4" stroke-width="1"/>';
+    for(var k=1;k<=70;k++){ var h=(y1-y0)*P[k], c=k<n?BLUE:(k===n?GOLD:DIM);
+      g+='<rect x="'+(x0+(k-1)*bw+0.5).toFixed(1)+'" y="'+(y1-h).toFixed(1)+'" width="'+(bw-1).toFixed(1)+'" height="'+h.toFixed(1)+'" fill="'+c+'"/>'; }
+    [1,10,20,30,40,50,60,70].forEach(function(t){ g+=T((x0+(t-0.5)*bw).toFixed(1),y1+20,t===70?"70人":t,{a:"middle"}); });
+    $("b_chart").innerHTML=g;
+  }
+  sl.addEventListener("input",draw); draw();
+})();
+
+/* ---------- 02 モンティ・ホール ---------- */
+var M_reset;
+(function(){
+  var mode="play", phase=0, car=-1, pick=-1, opened=-1, fin=-1, switched=false, wait=0;
+  var R={sT:0,sW:0,wT:0,wW:0};
+  var doors=[0,1,2].map(function(i){return $("m_d"+i);}), tags=[0,1,2].map(function(i){return $("m_t"+i);});
+  function r3(){ return Math.floor(Math.random()*3); }
+  function host(p,c){ var o=[]; for(var i=0;i<3;i++) if(i!==p&&i!==c) o.push(i); return o[Math.floor(Math.random()*o.length)]; }
+  function other(p,o){ for(var i=0;i<3;i++) if(i!==p&&i!==o) return i; return p; }
+  function resetRound(){ phase=0; car=pick=opened=fin=-1; switched=false; wait=0; }
+  doors.forEach(function(b,i){ b.addEventListener("click",function(){
+    if(mode!=="play"||phase!==0) return; pick=i; car=r3(); opened=host(pick,car); phase=2; render(); }); });
+  function decide(sw){ if(mode!=="play"||phase!==2) return;
+    fin=sw?other(pick,opened):pick; switched=sw; var win=fin===car;
+    if(sw){ R.wT++; if(win)R.wW++; } else { R.sT++; if(win)R.sW++; } phase=3; render(); }
+  $("m_stay").addEventListener("click",function(){decide(false);});
+  $("m_sw").addEventListener("click",function(){decide(true);});
+  $("m_again").addEventListener("click",function(){ resetRound(); render(); });
+  $("m_mode").addEventListener("click",function(){ mode=mode==="play"?"auto":"play"; resetRound(); render(); });
+  $("m_batch").addEventListener("click",function(){ var st=0; for(var i=0;i<100;i++) if(r3()===r3()) st++;
+    R.sT+=100; R.sW+=st; R.wT+=100; R.wW+=100-st; render(); });
+  setInterval(function(){
+    if(mode!=="auto"||!isOn("s2")) return;
+    if(phase===0){ phase=1; car=r3(); pick=r3(); }
+    else if(phase===1){ phase=2; opened=host(pick,car); }
+    else if(phase===2){ phase=3; fin=pick; var sw=pick===car; R.sT++; R.wT++; if(sw)R.sW++; else R.wW++; wait=0; }
+    else { if(wait>=2) resetRound(); else wait++; }
+    render();
+  },750);
+  function render(){
+    var play=mode==="play", chosen=phase===3?fin:pick;
+    $("m_title").textContent=play?"① 実験：自分で遊んでみる":"① 実験：自動で何度も遊ぶ";
+    $("m_sub").textContent=play?"ドアをクリックして遊ぶ":"両方の結果を記録";
+    $("m_mode").textContent=play?"自動で見る":"自分で遊ぶ";
+    doors.forEach(function(b,i){
+      var cls="door", lab=String(i+1), tag="", tc=MUTED;
+      if(play&&phase===0) cls+=" can";
+      if(phase>=1&&i===chosen){ cls+=" pick"; tag=(phase===3&&switched)?"変えた後の選択":"あなたの選択"; tc=MERC; }
+      if(phase>=2&&i===opened){ cls+=" goat"; lab="ヤギ"; tag="司会者が開けた"; tc=MUTED; }
+      else if(phase===2&&i!==chosen){ tag="変えるならこっち"; tc=GOLD; }
+      if(phase===3){ if(i===car){ cls=cls.replace(" goat","")+" car"; lab="車"; } else if(cls.indexOf("goat")<0){ cls+=" goat"; lab="ヤギ"; } }
+      b.className=cls; b.textContent=lab; b.disabled=!(play&&phase===0);
+      b.setAttribute("aria-label","ドア"+(i+1)); tags[i].textContent=tag; tags[i].style.color=tc;
+    });
+    var st="", sc=MUTED;
+    if(play){
+      if(phase===0){ st="好きなドアを1つ、クリックしてください。"; sc=MERC; }
+      if(phase===2){ st="司会者がヤギのドア"+(opened+1)+"を開けました。どうする？"; sc=PAPER; }
+      if(phase===3){ var won=fin===car, how=switched?"（変えて）":"（変えずに）"; st=won?"当たり！ 車をゲット"+how:"ハズレ…ヤギでした"+how; sc=won?GOLD:COP; }
+    } else {
+      st="3つのドアのうち1つに車。残り2つはヤギです。";
+      if(phase===1){ st="ドア"+(pick+1)+"を選びました。"; sc=MERC; }
+      if(phase===2){ st="司会者がヤギのドア"+(opened+1)+"を開けました。"; sc=PAPER; }
+      if(phase===3){ var s2=pick===car; st="変えない → "+(s2?"当たり":"ハズレ")+"　変える → "+(s2?"ハズレ":"当たり"); sc=s2?MERC:GOLD; }
+    }
+    $("m_status").textContent=st; $("m_status").style.color=sc;
+    $("m_choice").style.display=(play&&phase===2)?"flex":"none";
+    $("m_again").style.display=(play&&phase===3)?"inline-block":"none";
+    var sp=R.sT?R.sW/R.sT:0, wp=R.wT?R.wW/R.wT:0;
+    $("m_sb").style.width=pct(sp); $("m_wb").style.width=pct(wp);
+    $("m_sv").innerHTML=R.sT?"<b>"+pct(sp)+"</b>"+R.sW+"勝 / "+R.sT+"回":"まだ記録なし";
+    $("m_wv").innerHTML=R.wT?"<b class='gold'>"+pct(wp)+"</b>"+R.wW+"勝 / "+R.wT+"回":"まだ記録なし";
+  }
+  render();
+
+  /* 右：ドア1を選んだときの3通り */
+  var CASES=[{car:0,host:"ドア2か3",open:[1,2],stay:true},{car:1,host:"ドア3",open:[2],stay:false},{car:2,host:"ドア2",open:[1],stay:false}];
+  var kstep=0, klast=Date.now();
+  function krender(){
+    CASES.forEach(function(c,i){
+      var row=$("k_r"+i), shown=i<=kstep, ds=row.querySelectorAll(".md");
+      row.className="mrow"+(shown?"":" dim")+(kstep<3&&i===kstep?" now":"");
+      for(var d=0;d<3;d++){
+        var cls="md"+(d===0?" pick":""), t=String(d+1);
+        if(shown){ if(d===c.car){ cls+=" car"; t="車"; } else if(c.open.indexOf(d)>=0&&c.open.length===1){ cls+=" opened"; t="ヤギ"; } else { cls+=" goat"; t="ヤギ"; } }
+        ds[d].className=cls; ds[d].textContent=t;
+      }
+      $("k_h"+i).textContent=shown?c.host+"を開ける":"";
+      var s=$("k_s"+i), w=$("k_w"+i);
+      s.className="chip "+(shown?(c.stay?"win":"lose"):"q"); s.textContent=shown?(c.stay?"当たり":"ハズレ"):"？";
+      w.className="chip "+(shown?(c.stay?"lose":"win"):"q"); w.textContent=shown?(c.stay?"ハズレ":"当たり"):"？";
+    });
+    $("k_sum").style.opacity=kstep===3?1:0;
+    $("k_step").textContent=(kstep+1)+" / 4";
+  }
+  $("k_next").addEventListener("click",function(){ kstep=(kstep+1)%4; krender(); klast=Date.now(); });
+  setInterval(function(){ if(!isOn("s2")) return; if(Date.now()-klast>4000){ kstep=(kstep+1)%4; krender(); klast=Date.now(); } },250);
+  M_reset=function(){ kstep=0; krender(); klast=Date.now(); };
+  krender();
+})();
+
+/* ---------- 03 偽陽性 ---------- */
+var Y_reset;
+(function(){
+  var grid=$("y_grid"), dots=[], i, r=rng(11);
+  for(i=0;i<1000;i++){ var d=document.createElement("div"); d.className="yd"; grid.appendChild(d); dots.push(d); }
+  var sick=sample(1000,10,r), sickSet={}; sick.forEach(function(k){sickSet[k]=1;});
+  var healthy=[]; for(i=0;i<1000;i++) if(!sickSet[i]) healthy.push(i);
+  var fpIdx=sample(healthy.length,50,r).map(function(k){return healthy[k];}), fpSet={}; fpIdx.forEach(function(k){fpSet[k]=1;});
+  var missed=sick[9], step=0, lastT=Date.now();
+  var msgs=[["1000人。このうち病気の人は10人（1%）だけ。",MERC],
+            ["赤が病気の10人。残りの990人は健康です。",COP],
+            ["検査で陽性：病気10人中9人＋健康な人の5%（約50人）",GOLD],
+            ["陽性59人のうち、本当に病気は9人だけ（約15%）",COP]];
+  function show(){
+    for(var k=0;k<1000;k++){
+      var c="yd";
+      if(step>=1&&sickSet[k]) c+=" sick";
+      if(step>=2&&fpSet[k]) c+=" fp";
+      if(step>=3&&!(fpSet[k]||(sickSet[k]&&k!==missed))) c+=" fade";
+      dots[k].className=c;
+    }
+    $("y_status").textContent=msgs[step][0]; $("y_status").style.color=msgs[step][1];
+    $("y_step").textContent=(step+1)+" / 4"; $("y_barw").style.opacity=step===3?1:0;
+  }
+  $("y_next").addEventListener("click",function(){ step=(step+1)%4; show(); lastT=Date.now(); });
+  setInterval(function(){ if(!isOn("s3")) return; if(Date.now()-lastT>3000){ step=(step+1)%4; show(); lastT=Date.now(); } },250);
+  Y_reset=function(){ step=0; show(); lastT=Date.now(); };
+  show();
+
+  var sp=$("y_prev"), sf=$("y_fpr");
+  function draw(){
+    var p=(+sp.value)/1000, f=(+sf.value)/100, sens=0.9;
+    var tp=1000*p*sens, fp=1000*(1-p)*f, post=tp/(tp+fp);
+    $("y_prevv").textContent=(p*100).toFixed(1)+"%"; $("y_fprv").textContent=(f*100).toFixed(1)+"%";
+    $("y_post").textContent=(post*100).toFixed(1); var c=post<0.5?COP:GOLD; $("y_post").style.color=c; $("y_postu").style.color=c;
+    $("y_tp").style.width=pct(post,2); $("y_fp").style.width=pct(1-post,2);
+    $("y_tpv").textContent="本当に病気 "+tp.toFixed(1)+"人"; $("y_fpv").textContent="健康なのに陽性 "+fp.toFixed(1)+"人";
+    $("y_msg").textContent=post<0.5?"陽性の人の半分以上は、実は健康な人です。":"病気の人が多い集団では、陽性の信頼度が上がります。";
+  }
+  sp.addEventListener("input",draw); sf.addEventListener("input",draw); draw();
+})();
+
+/* ---------- 04 平均への回帰 ---------- */
+(function(){
+  var svg=$("r_svg"), stores=[], seed=3, anim=null, revealed=false;
+  var X1=150, X2=400, Y0=30, Y1=200;
+  function yOf(s){ s=Math.max(20,Math.min(80,s)); return Y1-(s-20)/60*(Y1-Y0); }
+  function gen(){
+    for(var tries=0;tries<200;tries++){
+      var r=rng(seed++); stores=[];
+      for(var i=0;i<20;i++){ var sk=50+gauss(r)*6; stores.push({m1:sk+gauss(r)*7, m2:sk+gauss(r)*7}); }
+      var ord=stores.slice().sort(function(a,b){return a.m1-b.m1;});
+      stores.forEach(function(s){s.g=0;}); ord.slice(0,5).forEach(function(s){s.g=-1;}); ord.slice(15).forEach(function(s){s.g=1;});
+      if(avg(-1,"m2")-avg(-1,"m1")>4 && avg(1,"m1")-avg(1,"m2")>4) break;
+    }
+    revealed=false; drawAt(0); txt(0);
+  }
+  function avg(g,k){ var a=stores.filter(function(s){return s.g===g;}), t=0; a.forEach(function(s){t+=s[k];}); return t/a.length; }
+  function txt(done){
+    if(!done){ $("r_low").textContent="下位5店（赤）を叱り、上位5店（金）をほめました。来月は？"; $("r_low").style.color=MERC; $("r_high").textContent=""; return; }
+    var l1=avg(-1,"m1"),l2=avg(-1,"m2"),h1=avg(1,"m1"),h2=avg(1,"m2");
+    function sg(d){ return (d>=0?"＋":"−")+Math.abs(d).toFixed(1); }
+    $("r_low").style.color=COP;
+    $("r_low").textContent="叱った下位5店：平均 "+l1.toFixed(1)+" → "+l2.toFixed(1)+"点（"+sg(l2-l1)+"）";
+    $("r_high").textContent="ほめた上位5店：平均 "+h1.toFixed(1)+" → "+h2.toFixed(1)+"点（"+sg(h2-h1)+"）";
+  }
+  function drawAt(t){
+    var g=T(X1,18,"今月",{a:"middle",c:PAPER,fs:15,w:700})+T(X2,18,"来月",{a:"middle",c:PAPER,fs:15,w:700});
+    [20,35,50,65,80].forEach(function(v){ var y=yOf(v); g+='<line x1="70" y1="'+y+'" x2="480" y2="'+y+'" stroke="#1f2125"/>'+T(60,y+4,v+"点",{a:"end"}); });
+    g+='<line x1="'+X1+'" y1="'+Y0+'" x2="'+X1+'" y2="'+Y1+'" stroke="'+FAINT+'"/><line x1="'+X2+'" y1="'+Y0+'" x2="'+X2+'" y2="'+Y1+'" stroke="'+FAINT+'"/>';
+    var order=stores.slice().sort(function(a,b){return Math.abs(a.g)-Math.abs(b.g);});
+    order.forEach(function(s){
+      var c=s.g<0?COP:(s.g>0?GOLD:"#4b5058"), y1=yOf(s.m1), y2=yOf(s.m2), x=X1+(X2-X1)*t, y=y1+(y2-y1)*t, op=s.g?1:0.3;
+      if(t>0) g+='<line x1="'+X1+'" y1="'+y1.toFixed(1)+'" x2="'+x.toFixed(1)+'" y2="'+y.toFixed(1)+'" stroke="'+c+'" stroke-width="'+(s.g?2:1.2)+'" opacity="'+op+'"/>';
+      g+='<circle cx="'+X1+'" cy="'+y1.toFixed(1)+'" r="6" fill="'+c+'"/>';
+      if(t>0) g+='<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="6" fill="'+c+'"/>';
+    });
+    svg.innerHTML=g;
+  }
+  $("r_go").addEventListener("click",function(){
+    if(anim) return; var t0=null;
+    (function step(ts){ if(t0===null)t0=ts; var u=Math.min(1,(ts-t0)/1400), e=u*u*(3-2*u); drawAt(e);
+      if(u<1) anim=requestAnimationFrame(step); else { anim=null; revealed=true; txt(1); } })(performance.now());
+  });
+  $("r_new").addEventListener("click",function(){ if(anim){cancelAnimationFrame(anim);anim=null;} gen(); });
+  gen();
+
+  var sl=$("r_sl");
+  function draw(){
+    var r=(+sl.value)/100, lo=50-14, hi=50+14, lo2=50-14*(1-r), hi2=50+14*(1-r);
+    $("r_v").textContent=Math.round(r*100)+"%";
+    var x0=40, x1=510; function X(v){ return x0+(v-20)/60*(x1-x0); }
+    var g='<line x1="'+x0+'" y1="112" x2="'+x1+'" y2="112" stroke="'+FAINT+'"/>';
+    [20,30,40,50,60,70,80].forEach(function(v){ g+='<line x1="'+X(v)+'" y1="108" x2="'+X(v)+'" y2="116" stroke="'+FAINT+'"/>'+T(X(v),136,v,{a:"middle"}); });
+    g+='<line x1="'+X(50)+'" y1="14" x2="'+X(50)+'" y2="112" stroke="'+MUTED+'" stroke-dasharray="4 4"/>'+T(X(50)+6,24,"平均",{});
+    function arrow(a,b,y,c){
+      var s='<circle cx="'+X(a)+'" cy="'+y+'" r="7" fill="none" stroke="'+c+'" stroke-width="2"/>';
+      if(Math.abs(b-a)>0.6){ var dir=b>a?1:-1;
+        s+='<line x1="'+(X(a)+dir*9)+'" y1="'+y+'" x2="'+(X(b)-dir*9)+'" y2="'+y+'" stroke="'+c+'" stroke-width="3"/>'+
+           '<path d="M'+(X(b)-dir*9)+','+(y-6)+' L'+(X(b)-dir*1)+','+y+' L'+(X(b)-dir*9)+','+(y+6)+'z" fill="'+c+'"/>'; }
+      return s+'<circle cx="'+X(b)+'" cy="'+y+'" r="6" fill="'+c+'"/>';
+    }
+    g+=arrow(lo,lo2,54,COP)+arrow(hi,hi2,84,GOLD)+T(40,59,"下位2割",{c:COP,fs:14,w:700})+T(40,89,"上位2割",{c:GOLD,fs:14,w:700});
+    $("r_line").innerHTML=g;
+    $("r_t1").textContent="今月 "+lo.toFixed(0)+"点 → 来月 "+lo2.toFixed(1)+"点（何もしなくても＋"+(lo2-lo).toFixed(1)+"点）";
+    $("r_t2").textContent="今月 "+hi.toFixed(0)+"点 → 来月 "+hi2.toFixed(1)+"点（何もしなくても−"+(hi-hi2).toFixed(1)+"点）";
+    $("r_t3").textContent=r===0?"運がゼロなら、成績はそのまま続きます。":(r===1?"すべて運なら、翌月はみんな平均の50点に戻ります。":"白い丸＝今月、塗りの丸＝来月の平均（予想）");
+  }
+  sl.addEventListener("input",draw); draw();
+})();
+
+/* ---------- 05 生存者バイアス ---------- */
+(function(){
+  var svg=$("v_svg");
+  var Z={ body:[[60,88,410,26]], wing:[[230,14,80,74],[230,114,80,74]], tail:[[66,52,46,36],[66,114,46,36]], eng:[[312,36,38,20],[312,146,38,20]] };
+  var surv={wing:0.9, body:0.85, tail:0.75, eng:0.25}, names={wing:"翼",body:"胴体",tail:"尾翼",eng:"エンジン"};
+  var holes=[], shots=0, chosen=null, pauseN=0;
+  function inEng(x,y){ return Z.eng.some(function(r){ return x>=r[0]-2&&x<=r[0]+r[2]+2&&y>=r[1]-2&&y<=r[1]+r[3]+2; }); }
+  function pt(z){ var rs=Z[z], tot=0; rs.forEach(function(r){tot+=r[2]*r[3];});
+    for(var tries=0;tries<20;tries++){ var u=Math.random()*tot, r=rs[0];
+      for(var i=0;i<rs.length;i++){ if(u<rs[i][2]*rs[i][3]){ r=rs[i]; break; } u-=rs[i][2]*rs[i][3]; }
+      var x=r[0]+3+Math.random()*(r[2]-6), y=r[1]+3+Math.random()*(r[3]-6);
+      if(z!=="eng"&&inEng(x,y)) continue; return [x,y]; }
+    return [rs[0][0]+5,rs[0][1]+5]; }
+  function base(){
+    var g="";
+    function rect(r,z,rx){ var hl=chosen===z; return '<rect x="'+r[0]+'" y="'+r[1]+'" width="'+r[2]+'" height="'+r[3]+'" rx="'+rx+'" fill="'+(hl?"#262a31":"#1b1d22")+'" stroke="'+(hl?MERC:"#3a3f47")+'" stroke-width="'+(hl?2:1.2)+'"/>'; }
+    Z.wing.forEach(function(r){ g+=rect(r,"wing",6); });
+    Z.tail.forEach(function(r){ g+=rect(r,"tail",5); });
+    g+=rect(Z.body[0],"body",13);
+    Z.eng.forEach(function(r){ g+=rect(r,"eng",10); });
+    g+=T(222,30,"翼",{a:"end",c:"#7f8c9b",fs:13})+T(89,44,"尾翼",{a:"middle",c:"#7f8c9b",fs:13})+T(470,80,"胴体",{a:"end",c:"#7f8c9b",fs:13})+T(358,51,"エンジン",{c:"#7f8c9b",fs:13});
+    return g;
+  }
+  function draw(){
+    var g=base(); holes.forEach(function(h){ g+='<circle cx="'+h[0].toFixed(1)+'" cy="'+h[1].toFixed(1)+'" r="2.6" fill="'+GOLD+'"/>'; });
+    svg.innerHTML=g; $("v_cnt").textContent="弾 "+shots+"発 → 跡 "+holes.length+"個";
+  }
+  setInterval(function(){
+    if(!isOn("s5")) return;
+    if(holes.length>=240){ if(++pauseN>30){ holes=[]; shots=0; pauseN=0; } draw(); return; }
+    for(var k=0;k<2;k++){ var zs=["wing","body","tail","eng"], z=zs[Math.floor(Math.random()*4)]; shots++;
+      var s=z==="eng"?(+$("v_sl").value)/100:surv[z]; if(Math.random()<s) holes.push(pt(z)); }
+    draw();
+  },90);
+  Array.prototype.forEach.call(document.querySelectorAll("#s5 .zb .bt"),function(b){
+    b.addEventListener("click",function(){
+      chosen=b.dataset.z;
+      Array.prototype.forEach.call(document.querySelectorAll("#s5 .zb .bt"),function(x){ x.classList.toggle("chosen",x===b); });
+      var m=$("v_msg");
+      if(chosen==="eng"){ m.textContent="正解！ エンジンを撃たれた機体は、帰ってこられなかった"; m.style.color=GOLD; }
+      else { m.textContent="残念。"+names[chosen]+"は撃たれても帰ってこられた場所です"; m.style.color=COP; }
+      draw();
+    });
+  });
+  draw();
+
+  var sl=$("v_sl"), order=["wing","body","tail","eng"];
+  function rows(){
+    var e=(+sl.value)/100, s={wing:0.9,body:0.85,tail:0.75,eng:e}, tot=0;
+    order.forEach(function(z){tot+=s[z];});
+    $("v_v").textContent=Math.round(e*100)+"%";
+    var h="";
+    order.forEach(function(z){ var sh=tot?s[z]/tot:0;
+      h+='<div class="hb"><div class="lb" style="width:66px;color:'+(z==="eng"?COP:PAPER)+'">'+names[z]+'</div><div style="flex:1;display:flex;flex-direction:column;gap:3px">'+
+        '<div class="tr" style="height:9px"><div class="fl" style="width:25%;background:'+BLUE+'"></div></div>'+
+        '<div class="tr" style="height:9px"><div class="fl" style="width:'+pct(sh,2)+';background:'+GOLD+'"></div></div></div>'+
+        '<div class="vl" style="width:118px">25% → <b class="gold" style="margin-left:4px">'+pct(sh,0)+'</b></div></div>'; });
+    $("v_rows").innerHTML=h;
+    var es=tot?s.eng/tot:0;
+    $("v_out").innerHTML='帰還機だけを見ると、エンジンの被弾は <b class="cop">'+pct(es,0)+'</b> しか見えない（本当は25%）';
+  }
+  sl.addEventListener("input",rows); rows();
+})();
+
+/* ---------- 06 シンプソンのパラドックス ---------- */
+var P_restart;
+(function(){
+  var box=$("p_box"), sq=[], labs={}, step=0, lastT=Date.now();
+  var G=[{p:"A",t:"e",n:10,w:9},{p:"A",t:"h",n:90,w:30},{p:"B",t:"e",n:90,w:72},{p:"B",t:"h",n:10,w:2}];
+  G.forEach(function(g){ for(var i=0;i<g.n;i++){ var d=document.createElement("div"); d.className="pq";
+    d.style.background=i<g.w?(g.p==="A"?GOLD:BLUE):"#2a2c31"; box.appendChild(d); sq.push({el:d,p:g.p,t:g.t,win:i<g.w}); } });
+  function lab(id,html,x,y,c,fs){ var d=document.createElement("div"); d.className="plab"; d.innerHTML=html;
+    d.style.left=x+"px"; d.style.top=y+"px"; d.style.color=c; if(fs) d.style.fontSize=fs+"px"; box.appendChild(d); labs[id]=d; }
+  var AX=104, BX=326;
+  lab("hA","Aさん",AX,0,GOLD,16); lab("hB","Bさん",BX,0,MERC,16);
+  lab("re","簡単な<br>案件",0,24,PAPER,15); lab("rh","難しい<br>案件",0,138,PAPER,15);
+  lab("tA","合計 39%",AX,172,GOLD,20); lab("tB","合計 74%",BX,172,MERC,20);
+  lab("cAe","10件",AX,42,GOLD); lab("cBe","90件",BX,112,MERC);
+  lab("cAh","90件",AX,226,GOLD); lab("cBh","10件",BX,156,MERC);
+  lab("rAe","90% <span style='color:#ece7dc'>勝ち</span>",AX,42,GOLD); lab("rBe","80%",BX,112,MERC);
+  lab("rAh","33% <span style='color:#ece7dc'>勝ち</span>",AX,226,GOLD); lab("rBh","20%",BX,156,MERC);
+  var H=["① 実験：合計で比べると…","① 実験：案件の中身を分けると…","① 実験：種類ごとに比べると…"];
+  var M=[["合計の成約率：A 39%、B 74%。Bさんの方が腕がいい？",MERC],
+         ["Aさんは難しい案件が90件。Bさんは簡単な案件が90件。",PAPER],
+         ["簡単な案件も、難しい案件も、Aさんの勝ち！",GOLD]];
+  function layout(){
+    var tot=step===0;
+    ["A","B"].forEach(function(p){
+      var X=p==="A"?AX:BX;
+      if(tot){ var all=sq.filter(function(s){return s.p===p;}).sort(function(a,b){return b.win-a.win;});
+        all.forEach(function(s,i){ s.el.style.left=(X+(i%10)*14)+"px"; s.el.style.top=(24+Math.floor(i/10)*14)+"px"; }); }
+      else { ["e","h"].forEach(function(t){ var Y=t==="e"?24:138;
+        var gr=sq.filter(function(s){return s.p===p&&s.t===t;}).sort(function(a,b){return b.win-a.win;});
+        gr.forEach(function(s,i){ s.el.style.left=(X+(i%15)*14)+"px"; s.el.style.top=(Y+Math.floor(i/15)*14)+"px"; }); }); }
+    });
+    function show(keys,v){ keys.forEach(function(k){ labs[k].style.opacity=v?1:0; }); }
+    show(["tA","tB"],step===0); show(["re","rh"],step>0);
+    show(["cAe","cBe","cAh","cBh"],step===1); show(["rAe","rBe","rAh","rBh"],step===2);
+    $("p_h3").textContent=H[step]; $("p_step").textContent=(step+1)+" / 3";
+    $("p_status").textContent=M[step][0]; $("p_status").style.color=M[step][1];
+  }
+  $("p_next").addEventListener("click",function(){ step=(step+1)%3; layout(); lastT=Date.now(); });
+  setInterval(function(){ if(!isOn("s6")) return; if(Date.now()-lastT>4500){ step=(step+1)%3; layout(); lastT=Date.now(); } },250);
+  P_restart=function(){ step=0; layout(); lastT=Date.now(); };
+  layout();
+
+  var sl=$("p_sl"), svg=$("p_svg");
+  function draw(){
+    var h=(+sl.value)/100, a=0.9*(1-h)+(1/3)*h, b=0.74;
+    $("p_v").textContent=Math.round(h*100)+"%";
+    var x0=70, x1=520; function X(v){ return x0+v*(x1-x0); }
+    var g="";
+    [0,0.2,0.4,0.6,0.8,1].forEach(function(v){ g+='<line x1="'+X(v)+'" y1="20" x2="'+X(v)+'" y2="166" stroke="#1f2125"/>'+T(X(v),184,Math.round(v*100)+"%",{a:"middle"}); });
+    function row(name,y,lo,hi,tot,c){
+      var s=T(0,y+5,name,{c:c,fs:16,w:700});
+      s+='<line x1="'+X(lo)+'" y1="'+y+'" x2="'+X(hi)+'" y2="'+y+'" stroke="'+c+'" stroke-width="4" stroke-linecap="round" opacity=".45"/>';
+      s+='<circle cx="'+X(lo)+'" cy="'+y+'" r="5" fill="#141519" stroke="'+c+'" stroke-width="2"/><circle cx="'+X(hi)+'" cy="'+y+'" r="5" fill="#141519" stroke="'+c+'" stroke-width="2"/>';
+      s+=T(X(lo),y+26,"難しい "+Math.round(lo*100)+"%",{a:"middle",c:MUTED})+T(X(hi),y+26,"簡単 "+Math.round(hi*100)+"%",{a:"middle",c:MUTED});
+      s+='<circle cx="'+X(tot).toFixed(1)+'" cy="'+y+'" r="10" fill="'+c+'"/>';
+      s+=T(X(tot).toFixed(1),y-16,"合計 "+(tot*100).toFixed(0)+"%",{a:"middle",c:c,fs:15,w:700});
+      return s;
+    }
+    g+=row("Aさん",58,1/3,0.9,a,GOLD)+row("Bさん",128,0.2,0.8,b,MERC);
+    svg.innerHTML=g;
+    var m=$("p_msg");
+    if(a<b){ m.textContent="合計ではBさんの勝ちに見える（でも中身はAさんが上手）"; m.style.color=COP; }
+    else { m.textContent="条件がそろうと、合計でもAさんの勝ち（A "+(a*100).toFixed(0)+"% ＞ B 74%）"; m.style.color=GOLD; }
+  }
+  sl.addEventListener("input",draw); draw();
+})();
+
+/* ---------- 07 ギャンブラーの誤謬 ---------- */
+(function(){
+  var flips=[], run=0, runType="", maxRun=0, aft={h:0,t:0}, coin=$("c_coin");
+  function one(){
+    var h=Math.random()<0.5;
+    var hb=0; for(var i=flips.length-1;i>=0&&flips[i];i--) hb++;
+    if(hb>=3){ if(h)aft.h++; else aft.t++; }
+    flips.push(h);
+    if(h){ run=hb+1; if(run>maxRun) maxRun=run; }
+    return h;
+  }
+  function upd(){
+    var n=flips.length, hs=flips.filter(function(x){return x;}).length;
+    $("c_n").textContent=n; $("c_hp").textContent=n?pct(hs/n):"—";
+    var last=flips[n-1], c=0; for(var i=n-1;i>=0&&flips[i]===last;i--) c++;
+    $("c_run").textContent=n?(last?"表":"裏")+" "+c+"回":"—"; $("c_max").textContent=maxRun?"表 "+maxRun+"回":"—";
+    var h=""; flips.slice(-40).forEach(function(f){ h+='<div class="ch '+(f?"h":"t")+'"></div>'; });
+    $("c_hist").innerHTML=h;
+    var tot=aft.h+aft.t; $("c_ab").style.width=tot?pct(aft.h/tot):"0"; $("c_bb").style.width=tot?pct(aft.t/tot):"0";
+    $("c_av").innerHTML=tot?"<b class='gold'>"+pct(aft.h/tot,0)+"</b>"+aft.h+"回":"まだ記録なし";
+    $("c_bv").innerHTML=tot?"<b class='merc'>"+pct(aft.t/tot,0)+"</b>"+aft.t+"回":"まだ記録なし";
+  }
+  function face(h){ coin.className="coin "+(h?"h":"t"); coin.textContent=h?"表":"裏"; }
+  $("c_one").addEventListener("click",function(){
+    var h=one(); coin.classList.remove("spin"); void coin.offsetWidth; coin.classList.add("spin");
+    setTimeout(function(){ face(h); upd(); },260);
+  });
+  $("c_100").addEventListener("click",function(){ var h; for(var i=0;i<100;i++) h=one(); face(h); upd(); });
+  upd();
+
+  function pRun(n,k){ var a=[],j,done=0; for(j=0;j<k;j++)a.push(0); a[0]=1;
+    for(var i=0;i<n;i++){ var b=[]; for(j=0;j<k;j++)b.push(0);
+      for(j=0;j<k;j++){ var p=a[j]; if(!p)continue; b[0]+=p/2; if(j+1>=k) done+=p/2; else b[j+1]+=p/2; } a=b; }
+    return done; }
+  var sl=$("c_sl");
+  function draw(){
+    var k=+sl.value, p1=Math.pow(0.5,k), p3=pRun(100,k);
+    $("c_v").textContent=k+"回";
+    $("c_l1").textContent="表が"+k+"回続く確率（これから投げる場合）";
+    $("c_l2").textContent=k+"回続いた後、次も表が出る確率";
+    $("c_l3").textContent="100回投げて、どこかで"+k+"回以上続く確率";
+    $("c_b1").style.width=pct(p1,2); $("c_p1").textContent=pct(p1,p1<0.01?2:1);
+    $("c_b3").style.width=pct(p3,2); $("c_p3").textContent=pct(p3,0);
+  }
+  sl.addEventListener("input",draw); draw();
+})();
+
+/* ---------- 08 待ち行列 ---------- */
+(function(){
+  var box=$("q_box"), queue=[], serving=null, rho=0.8, mu=0.2, avg=0, ticks=0;
+  function place(){
+    queue.forEach(function(c,i){ if(i<20){ c.style.left=(404-i*19)+"px"; c.style.top="68px"; c.style.opacity=1; } else c.style.opacity=0; });
+    $("q_more").textContent=queue.length>20?"＋"+(queue.length-20)+"人":"";
+  }
+  function fill(){
+    queue.forEach(function(c){ c.remove(); }); queue=[];
+    var n=Math.min(40,Math.round(rho*rho/(1-rho)));
+    for(var i=0;i<n;i++){ var c=document.createElement("div"); c.className="qc"; c.style.left=(404-i*19)+"px"; c.style.top="68px"; box.appendChild(c); queue.push(c); }
+    place();
+  }
+  function setRho(v){ rho=v; avg=0; ticks=0; $("q_sl").value=Math.round(v*100); draw(); fill();
+    Array.prototype.forEach.call(document.querySelectorAll("#s8 [data-r]"),function(b){ b.className="bt "+(+b.dataset.r===Math.round(v*100)?"act":"alt"); }); }
+  setInterval(function(){
+    if(!isOn("s8")) return;
+    if(serving&&Math.random()<mu){ var s=serving; s.style.left="560px"; s.style.opacity=0; setTimeout(function(){ s.remove(); },400); serving=null; }
+    if(!serving&&queue.length){ serving=queue.shift(); serving.classList.add("sv"); serving.style.left="467px"; serving.style.top="68px"; }
+    if(Math.random()<rho*mu){ var c=document.createElement("div"); c.className="qc"; c.style.left="-20px"; c.style.top="68px"; box.appendChild(c);
+      queue.push(c); void c.offsetWidth; }
+    place(); ticks++; avg+=(queue.length-avg)/Math.min(ticks,600);
+    var n=queue.length, m=$("q_now"); m.textContent="いま並んでいる人："+n+"人"; m.style.color=n>=10?COP:(n>=4?GOLD:MERC);
+    $("q_rho").textContent="稼働率 "+Math.round(rho*100)+"%";
+    $("q_avg").innerHTML="平均の行列：<b>"+avg.toFixed(1)+"人</b>　<span class='mut'>（理論上の平均 "+(rho*rho/(1-rho)).toFixed(1)+"人）</span>";
+  },100);
+  Array.prototype.forEach.call(document.querySelectorAll("#s8 [data-r]"),function(b){ b.addEventListener("click",function(){ setRho(+b.dataset.r/100); }); });
+
+  var sl=$("q_sl"), svg=$("q_svg");
+  function draw(){
+    var r=(+sl.value)/100; rho=r;
+    Array.prototype.forEach.call(document.querySelectorAll("#s8 [data-r]"),function(b){ b.className="bt "+(+b.dataset.r===Math.round(r*100)?"act":"alt"); });
+    var w=r/(1-r); $("q_v").textContent=Math.round(r*100)+"%";
+    $("q_ib").style.width=pct(1-r); $("q_iv").textContent=Math.round((1-r)*100)+"%";
+    $("q_inote").textContent=r>=0.8?"空き時間が少ないと、偏って来たお客をさばききれません":"空き時間があるので、お客が重なっても行列はすぐ消えます";
+    $("q_inote").style.color=r>=0.8?COP:MUTED;
+    $("q_w").textContent=w.toFixed(1); $("q_w").style.color=r>=0.8?COP:GOLD;
+    var mins=w*10; $("q_min").textContent="1件10分なら平均 "+(mins>=60?Math.floor(mins/60)+"時間"+Math.round(mins%60)+"分":Math.round(mins)+"分")+"待ち";
+    var x0=50,x1=520,y0=30,y1=172; function X(v){return x0+v*(x1-x0);} function Y(v){return y1-Math.min(v,20)/20*(y1-y0);}
+    var g="";
+    [0,5,10,15,20].forEach(function(v){ g+='<line x1="'+x0+'" y1="'+Y(v)+'" x2="'+x1+'" y2="'+Y(v)+'" stroke="#1f2125"/>'+T(x0-8,Y(v)+4,v+"倍",{a:"end"}); });
+    [0,0.2,0.4,0.6,0.8,1].forEach(function(v){ g+=T(X(v),y1+20,Math.round(v*100)+"%",{a:"middle"}); });
+    g+='<rect x="'+X(0.8)+'" y="'+y0+'" width="'+(X(1)-X(0.8))+'" height="'+(y1-y0)+'" fill="rgba(224,106,69,.08)"/>';
+    g+=T(X(0.8)+4,18,"危険ゾーン",{c:COP,w:700});
+    var d=""; for(var v=0;v<=0.952;v+=0.004){ d+=(v===0?"M":"L")+X(v).toFixed(1)+","+Y(v/(1-v)).toFixed(1); }
+    g+='<path d="'+d+'" fill="none" stroke="'+GOLD+'" stroke-width="3"/>';
+    var cy=Y(w); g+='<line x1="'+X(r)+'" y1="'+cy+'" x2="'+X(r)+'" y2="'+y1+'" stroke="'+PAPER+'" stroke-dasharray="3 4"/>'+
+      '<circle cx="'+X(r)+'" cy="'+cy+'" r="7" fill="'+(r>=0.8?COP:GOLD)+'" stroke="#141519" stroke-width="2"/>';
+    svg.innerHTML=g;
+  }
+  sl.addEventListener("input",function(){ draw(); avg=0; ticks=0; });
+  sl.addEventListener("change",fill);
+  setRho(0.8);
+})();
+
+/* ---------- 09 秘書問題 ---------- */
+(function(){
+  var N=10, sc, cur, done, hired, win=0, games=0;
+  function newGame(){ sc=sample(99,N,Math.random).map(function(x){return x+1;}); cur=0; done=false; hired=-1; render(); }
+  function bestIdx(){ var b=0; for(var i=1;i<N;i++) if(sc[i]>sc[b]) b=i; return b; }
+  function finish(i){ hired=i; done=true; games++; if(i===bestIdx()) win++; render(); }
+  $("h_hire").addEventListener("click",function(){ if(!done) finish(cur); });
+  $("h_pass").addEventListener("click",function(){ if(done) return; if(cur<N-1){ cur++; render(); } });
+  $("h_again").addEventListener("click",newGame);
+  function render(){
+    var h="", b=bestIdx();
+    for(var i=0;i<N;i++){
+      var c="cd", v="?", sub=(i+1)+"人目";
+      if(done){ v=sc[i]; c+=i<=cur||i===hired?" seen":" ghost"; if(i===hired) c+=" hired"; if(i===b&&i!==hired) c+=" best"; if(i===b) sub="最高"; }
+      else if(i<cur){ c+=" seen"; v=sc[i]; } else if(i===cur){ c+=" cur"; v=sc[i]; }
+      h+='<div class="'+c+'"><span>'+v+'</span><small>'+sub+'</small></div>';
+    }
+    $("h_cards").innerHTML=h;
+    var prevBest=0; for(var k=0;k<cur;k++) prevBest=Math.max(prevBest,sc[k]);
+    if(!done){
+      $("h_who").textContent=(cur+1)+"人目の候補者"; $("h_score").textContent=sc[cur];
+      $("h_best").textContent=cur?"これまでの最高 "+prevBest+"点":"（1人目）";
+      $("h_msg").textContent=cur===N-1?"最後の1人。採用するしかありません。":"採用する？ 見送ると、この人には戻れません。";
+      $("h_msg").style.color=cur===N-1?COP:MERC;
+    } else {
+      $("h_who").textContent=(hired+1)+"人目を採用"; $("h_score").textContent=sc[hired]; $("h_best").textContent="全員の最高 "+sc[b]+"点";
+      var ok=hired===b; $("h_msg").textContent=ok?"成功！ 最高の人を採用できました":"残念。最高は"+(b+1)+"人目の"+sc[b]+"点でした";
+      $("h_msg").style.color=ok?GOLD:COP;
+    }
+    $("h_hire").style.display=done?"none":"inline-block"; $("h_pass").style.display=done?"none":"inline-block";
+    $("h_pass").disabled=cur===N-1; $("h_again").style.display=done?"inline-block":"none";
+    $("h_tally").textContent=games?"あなたの成功 "+win+" / "+games+" 回":"";
+  }
+  newGame();
+
+  var M=100, PS=[];
+  for(var r=0;r<M;r++){ if(r===0){ PS.push(1/M); continue; } var s=0; for(var i=r+1;i<=M;i++) s+=1/(i-1); PS.push(r/M*s); }
+  var sl=$("h_sl"), svg=$("h_svg");
+  function draw(){
+    var r=+sl.value, p=PS[r];
+    $("h_v").textContent=r+"人"; $("h_p").textContent=(p*100).toFixed(1);
+    var c=r>=30&&r<=44?GOLD:PAPER; $("h_p").style.color=c; $("h_pu").style.color=c;
+    var x0=50,x1=520,y0=14,y1=164; function X(v){return x0+v/90*(x1-x0);} function Y(v){return y1-v/0.4*(y1-y0);}
+    var g="";
+    [0,0.1,0.2,0.3,0.4].forEach(function(v){ g+='<line x1="'+x0+'" y1="'+Y(v)+'" x2="'+x1+'" y2="'+Y(v)+'" stroke="#1f2125"/>'+T(x0-8,Y(v)+4,Math.round(v*100)+"%",{a:"end"}); });
+    [0,10,20,30,50,60,70,80,90].forEach(function(v){ g+=T(X(v),y1+20,v+"人",{a:"middle"}); });
+    g+='<line x1="'+X(37)+'" y1="'+y0+'" x2="'+X(37)+'" y2="'+y1+'" stroke="'+GOLD+'" stroke-dasharray="4 4" opacity=".7"/>'+T(X(37),y1+20,"37人",{a:"middle",c:GOLD,w:700});
+    var d=""; for(var k=0;k<=90;k++) d+=(k?"L":"M")+X(k).toFixed(1)+","+Y(PS[k]).toFixed(1);
+    g+='<path d="'+d+'" fill="none" stroke="'+MERC+'" stroke-width="3"/>';
+    g+='<circle cx="'+X(r)+'" cy="'+Y(p)+'" r="7" fill="'+c+'" stroke="#141519" stroke-width="2"/>';
+    svg.innerHTML=g;
+  }
+  sl.addEventListener("input",draw); draw();
+})();
+
+/* ---------- 10 ベンフォードの法則 ---------- */
+(function(){
+  var B=[]; for(var d=1;d<=9;d++) B.push(Math.log10(1+1/d));
+  var cnt=[0,0,0,0,0,0,0,0,0], total=0, nat=true, recent=[];
+  function gen(){
+    if(nat) return Math.max(1,Math.round(Math.exp(9+gauss()*2.3)));
+    var d=1+Math.floor(Math.random()*9), k=2+Math.floor(Math.random()*4), p=Math.pow(10,k);
+    return d*p+Math.floor(Math.random()*p);
+  }
+  function lead(x){ return +String(x)[0]; }
+  function bars(svg,dist,col){
+    var x0=40,x1=530,y0=10,y1=146,bw=(x1-x0)/9; function Y(v){return y1-v/0.4*(y1-y0);}
+    var g="";
+    [0,0.1,0.2,0.3,0.4].forEach(function(v){ g+='<line x1="'+x0+'" y1="'+Y(v)+'" x2="'+x1+'" y2="'+Y(v)+'" stroke="#1f2125"/>'+T(x0-6,Y(v)+4,Math.round(v*100)+"%",{a:"end"}); });
+    for(var i=0;i<9;i++){ var x=x0+i*bw;
+      g+='<rect x="'+(x+8).toFixed(1)+'" y="'+Y(dist[i]).toFixed(1)+'" width="'+(bw-16).toFixed(1)+'" height="'+(y1-Y(dist[i])).toFixed(1)+'" fill="'+col+'" rx="2"/>';
+      g+='<line x1="'+(x+3).toFixed(1)+'" y1="'+Y(B[i]).toFixed(1)+'" x2="'+(x+bw-3).toFixed(1)+'" y2="'+Y(B[i]).toFixed(1)+'" stroke="'+GOLD+'" stroke-width="3"/>';
+      g+=T((x+bw/2).toFixed(1),y1+20,i+1,{a:"middle",c:PAPER,fs:15,f:"IBM Plex Mono, monospace"}); }
+    svg.innerHTML=g;
+  }
+  function render(){
+    var dist=cnt.map(function(c){return total?c/total:0;});
+    bars($("f_svg"),dist,nat?BLUE:COP);
+    $("f_n").textContent="集めた数字 "+total+"個";
+    var m=$("f_msg");
+    m.textContent=nat?"1から始まる数字："+pct(dist[0])+"（法則では30.1%）":"作った数字：1から始まるのは"+pct(dist[0])+"。法則から外れる";
+    m.style.color=nat?GOLD:COP;
+    $("f_tick").innerHTML=recent.map(function(x){ var s=String(x); return "<div><b>"+s[0]+"</b>"+s.slice(1).replace(/\B(?=(\d{3})+(?!\d))/g,",")+"</div>"; }).join("");
+  }
+  function setMode(n){ nat=n; cnt=[0,0,0,0,0,0,0,0,0]; total=0; recent=[];
+    $("f_nat").className="bt "+(n?"act":"alt"); $("f_fake").className="bt "+(n?"alt":"act"); render(); }
+  $("f_nat").addEventListener("click",function(){ setMode(true); });
+  $("f_fake").addEventListener("click",function(){ setMode(false); });
+  setInterval(function(){
+    if(!isOn("s10")) return;
+    if(total>=3000){ cnt=[0,0,0,0,0,0,0,0,0]; total=0; }
+    for(var i=0;i<6;i++){ var x=gen(); cnt[lead(x)-1]++; total++; recent.unshift(x); }
+    recent=recent.slice(0,6); render();
+  },160);
+  render();
+
+  var sl=$("f_sl");
+  function draw(){
+    var m=(+sl.value)/100, dist=B.map(function(b){ return (1-m)*b+m/9; });
+    var mad=0; for(var i=0;i<9;i++) mad+=Math.abs(dist[i]-B[i]); mad/=9;
+    $("f_v").textContent=Math.round(m*100)+"%";
+    bars($("f_svg2"),dist,m>0.25?COP:BLUE);
+    $("f_one").textContent=pct(dist[0]);
+    var jd=$("f_jd");
+    if(mad<0.006){ jd.textContent="自然"; jd.style.color=GOLD; }
+    else if(mad<0.015){ jd.textContent="やや不自然"; jd.style.color=MERC; }
+    else { jd.textContent="要確認"; jd.style.color=COP; }
+  }
+  sl.addEventListener("input",draw); draw();
+  $("f_svg2").setAttribute("viewBox","0 0 540 170");
+})();
+
+AL.onShow[3]=function(){ if(M_reset) M_reset(); };
+AL.onShow[4]=function(){ if(Y_reset) Y_reset(); };
+AL.onShow[7]=function(){ if(P_restart) P_restart(); };
+
+AL.init();
+</script>
+<script>
+/* ===== 目次ページへのリンクと、スライド外の目次アイコン・ページ送り矢印 ===== */
+(function(){
+  var E = window["AL"];
+  var stage = document.getElementById("stage");
+  var slides = Array.prototype.slice.call(document.querySelectorAll(".slide"));
+  var TOC = slides.indexOf(document.getElementById("sT"));
+  var M = 80;
+  Array.prototype.forEach.call(document.querySelectorAll(".tocc"), function(b){
+    b.addEventListener("click", function(e){ e.stopPropagation(); E.show(+b.dataset.go); });
+  });
+  var icon = document.createElement("button");
+  icon.type = "button"; icon.id = "tocIcon"; icon.setAttribute("aria-label","目次のページへ");
+  icon.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h12M8 12h12M8 18h12"/><circle cx="4" cy="6" r="1" fill="#d9b449"/><circle cx="4" cy="12" r="1" fill="#d9b449"/><circle cx="4" cy="18" r="1" fill="#d9b449"/></svg><span>目次</span>';
+  icon.addEventListener("click", function(e){ e.stopPropagation(); E.show(TOC); });
+  document.body.appendChild(icon);
+  function mk(dir){
+    var b = document.createElement("button");
+    b.type = "button"; b.className = "navArrow";
+    b.setAttribute("aria-label", dir < 0 ? "前のページ" : "次のページ");
+    b.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="' + (dir < 0 ? "M15 4 L7 12 L15 20" : "M9 4 L17 12 L9 20") + '"/></svg>';
+    b.addEventListener("click", function(e){ e.stopPropagation(); E.go(dir); });
+    document.body.appendChild(b);
+    return b;
+  }
+  var prev = mk(-1), next = mk(1);
+  function cur(){ for(var i=0;i<slides.length;i++) if(slides[i].classList.contains("on")) return i; return 0; }
+  function place(){
+    var s = Math.min((window.innerWidth - 2*M) / 1280, window.innerHeight / 720);
+    stage.style.transform = "scale(" + s + ")";
+    var r = stage.getBoundingClientRect(), y = r.top + r.height/2 - 32;
+    prev.style.left = Math.max(4, r.left - 56) + "px"; prev.style.top = y + "px";
+    next.style.left = Math.min(window.innerWidth - 48, r.right + 12) + "px"; next.style.top = y + "px";
+    icon.style.left = Math.max(4, r.left - 58) + "px"; icon.style.top = (r.top + 4) + "px";
+  }
+  function state(){ var c = cur(); prev.disabled = c === 0; next.disabled = c === slides.length - 1; icon.classList.toggle("here", c === TOC); }
+  window.addEventListener("resize", function(){ setTimeout(place, 0); });
+  place(); state();
+  new MutationObserver(state).observe(stage, {subtree:true, attributes:true, attributeFilter:["class"]});
+})();
+</script>
+</body>
+</html>
